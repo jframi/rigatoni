@@ -1,12 +1,11 @@
 Package: Rigatoni
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Object detection (typically grains) in images
 Version: 0.2.0
 Author: J-F Rami
 Maintainer: J-F Rami <rami@ciradfr>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Description: Rigatoni is an experimental port of the grainito (https://github.com/jframi/grainito) ImageJ macro
+License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
 Imports:
