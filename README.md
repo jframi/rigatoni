@@ -27,3 +27,7 @@ devtools::install_github("jframi/rigatoni")
 ```
 
 ## Getting started
+
+Read the
+[Vignette](https://jframi.github.io/rigatoni/articles/Rigatoni.html) to
+get started
