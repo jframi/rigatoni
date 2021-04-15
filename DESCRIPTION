@@ -11,4 +11,11 @@ LazyData: true
 Imports:
     data.table,
     EBImage
+Depends:
+    data.table,
+    EBImage
 RoxygenNote: 6.1.1
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
