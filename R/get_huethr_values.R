@@ -1,12 +1,14 @@
-get_huethr_values<-function(img){
+get_huethr_values<-function(img, return.values=TRUE){
   img<-resize(img,w = 500)
   rgb<-matrix(c(c(img[,,1]),c(img[,,2]),c(img[,,3])),nrow = 3, byrow = T)
   # convert to hsv
   x<-rgb2hsv(rgb)
   # hist h component
-  hist(x[1,],xlim=c(0,1),xlab="Hue value")
-  bounds<-locator(2)
-  return(round(255*bounds$x,0))
+  hist(x[1,],xlim=c(0,1),xlab="Hue value", main="")
+  if (return.values){
+    bounds<-locator(2)
+    return(round(255*bounds$x,0))
+  }
 }
 
 
