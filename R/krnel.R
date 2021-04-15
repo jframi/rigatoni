@@ -16,22 +16,32 @@
 #' @export
 #'
 #' @examples
-krnel<- function(img, crop, resizw, huethres, minsize, maxsize, save.outline=F){
+krnel<- function(img, crop=NULL, resizw=NULL, huethres, minsize, maxsize, save.outline=F, img.name=NULL){
 
-  mf<-match.call()
-  if(class(eval(mf$img))=="Image"){
-    img.name<-as.character(mf$img)
-  }else{
-    img.name<-eval(mf$img)
-  }
+  #mf<-match.call()
+  #if(class(eval(mf$img))=="Image"){
+  #  img.name<-as.character(mf$img)
+  #}else{
+  #  img.name<-eval(mf$img)
+  #}
 
   if (!class(img)=="Image"){
+    img.name <- img
     img = readImage(img)
+  } else {
+    if (save.outline==T & is.null(img.name)) stop("If img is an EBImage image object and save.outline=T you should provide an image.name for the output file")
   }
   #crop
-  img <- img[crop[1]:crop[2], crop[3]:crop[4],1:3]
+  if (!is.null(crop)){
+    img <- img[crop[1]:crop[2], crop[3]:crop[4],1:3]
+  }
   #resize
-  img<-resize(img,w = resizw)
+  if (!is.null(resizw)){
+    img<-resize(img,w = resizw)
+  } else {
+    resizw <- dim(img)[2]
+  }
+
   # Make rgb matrix
   #rgb<-rbind(c(img[,,1]),c(img[,,2]),c(img[,,3]))
   rgb<-matrix(c(c(img[,,1]),c(img[,,2]),c(img[,,3])),nrow = 3, byrow = T)
