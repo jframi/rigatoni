@@ -73,7 +73,7 @@ The `minsize` and `maxsize` parameters allow to fix the minimum and maximum size
 The object that is returned by the `krnel` function is of S3 class.. `krnel`  
 It is a list with three components:
 
-- features : a data.frame with as many rows as the number of detected features and description variables as returned by EBImage::computeFeatures
+- features : a data.frame with as many rows as the number of detected features and description variables as returned by `EBImage::computeFeatures`
 - contours : a list with as many elements as the number of detected features Each element is a matrix with the coordinates of each feature.
 - params : a list with the analysis parameters. can be used for further plotting
 

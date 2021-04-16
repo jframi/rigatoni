@@ -108,7 +108,8 @@ The <code>minsize</code> and <code>maxsize</code> parameters allow to fix the mi
 <p>The object that is returned by the <code>krnel</code> function is of S3 class.. <code>krnel</code><br>
 It is a list with three components:</p>
 <ul>
-<li>features : a data.frame with as many rows as the number of detected features and description variables as returned by EBImage::computeFeatures</li>
+<li>features : a data.frame with as many rows as the number of detected features and description variables as returned by <code><a href="https://rdrr.io/pkg/EBImage/man/computeFeatures.html">EBImage::computeFeatures</a></code>
+</li>
 <li>contours : a list with as many elements as the number of detected features Each element is a matrix with the coordinates of each feature.</li>
 <li>params : a list with the analysis parameters. can be used for further plotting</li>
 </ul>
