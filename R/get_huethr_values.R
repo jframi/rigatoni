@@ -1,3 +1,12 @@
+#' Plot the histogram of hue values of image to determine the hue range of the background
+#'
+#' @param img
+#' @param return.values
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_huethr_values<-function(img, return.values=TRUE){
   img<-resize(img,w = 500)
   rgb<-matrix(c(c(img[,,1]),c(img[,,2]),c(img[,,3])),nrow = 3, byrow = T)
