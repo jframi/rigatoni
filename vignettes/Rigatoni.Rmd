@@ -73,14 +73,16 @@ The `minsize` and `maxsize` parameters allow to fix the minimum and maximum size
 The object that is returned by the `krnel` function is of S3 class.. `krnel`  
 It is a list with three components:
 
-- features : a data.frame with as many rows as the number of detected features and description variables as returned by `EBImage::computeFeatures`
+- features : a data.frame with as many rows as the number of detected features and description variables as returned by `EBImage::computeFeatures`. It also includes bounding box width and height aka Feret min and max diameter.
 - contours : a list with as many elements as the number of detected features Each element is a matrix with the coordinates of each feature.
+-  bbox : a list with as many elements as the number of detected features. Each element is a list with 4 components: `$pts` that contains the coordinates of each corner of the bounding box, `$width`, `$height`, and `$angle`
+
 - params : a list with the analysis parameters. can be used for further plotting
 
 The features of the `pods` object can be plotted with the plot function: 
 
 ```{r, echo=TRUE, fig.align="center"}
-plot(pods)
+plot(pods, plot.bbox = T)
 ```
 
 We can see that object #11 is the merger of two pods that were not separated on the scanner.  
@@ -89,7 +91,7 @@ Let's decrease it to 2000.
 
 We can also set `save.outline` to `TRUE` so that the analysed image will be saved in the same directory with detected objects outlines.  
 ```{r, eval=FALSE}
-pods<-krnel(img = img, resizw = 500, huethres = mythreshold, minsize = 100, maxsize = 2000, save.outline = T)
+pods<-krnel(img = img, resizw = 500, huethres = mythreshold, minsize = 100, maxsize = 2000, save.outline = T, img.name = "peanut_pod")
 ```
 ```{r, eval=TRUE, echo=FALSE}
 pods<-krnel(img = img, resizw = 500, huethres = mythreshold, minsize = 100, maxsize = 2000, save.outline = F)
@@ -102,7 +104,7 @@ display(img, method="raster")
 The resulting `pods` object no longer contains the 2 non separated pods.
 
 ```{r, echo=TRUE, fig.align="center"}
-plot(pods)
+plot(pods, plot.bbox = T)
 ```
 
 ## Working on many images
