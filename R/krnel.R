@@ -9,8 +9,9 @@
 #' @param save.outline boolean, should an outline image be saved in the same directory
 #'
 #' @return the function will return krnel object, ie. a list with three components
-#' * features : a data.frame with as many rows as the number of detected features and description variables as returned by EBImage::computeFeatures
-#' * contours : a list with as many elements as the number of detected features Each element is a matrix with the coordinates of each feature.
+#' * features : a data.frame with as many rows as the number of detected features and description variables as returned by EBImage::computeFeatures. It also includes bounding box width and height aka Feret min and max diameter.
+#' * contours : a list with as many elements as the number of detected features. Each element is a matrix with the coordinates of each feature.
+#' * bbox : a list with as many elements as the number of detected features. Each element is a list with 4 components: $pts that contains the coordinates of each corner of the bounding box, $width, $height, and $angle
 #' * params : a list with the analysis parameters. can be used for further plotting
 #' @md
 #' @export
@@ -80,11 +81,15 @@ krnel<- function(img, crop=NULL, resizw=NULL, huethres, minsize, maxsize, save.o
   nmask.cont<-ocontour(nmask)
   cols<-rgb(nmask.basr[,1],nmask.basg[,1],nmask.basb[,1])
 
+  nmask.bbox <- lapply(nmask.cont, getMinBBox)
+  nmask.bbox.wh <- do.call(rbind,lapply(nmask.bbox, function(a) data.table(bbox.width=a$width, bbox.height=a$height)))
   ret<-list(features= data.table(nmask.shp,
+                                 nmask.bbox.wh,
                                  nmask.mom,
                                  nmask.bas,
                                  cols),
             contours=nmask.cont,
+            bbox = nmask.bbox,
             params=list(crops=crop,
                         w=dim(img)[1],
                         h=dim(img)[2],
@@ -113,6 +118,7 @@ krnel<- function(img, crop=NULL, resizw=NULL, huethres, minsize, maxsize, save.o
 #'
 #' @return
 #' @export
+#' @noRd
 #' @examples
 krnellab<- function(img, crop=NULL, resizw=NULL, athres="auto", minsize,maxsize, save.outline=F){
 
