@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 
 Load the package
 
-```{r setup}
+```{r setup, message=FALSE, warning=FALSE}
 library(Rigatoni)
 ```
 
@@ -39,7 +39,7 @@ setwd("/path/to/the/directory/that/contains/images/to/analyse")
 ## Working on a single image
 
 We will use the `peanut_pod.jpg` example image that is provided as part of the package. This is peanut pods acquired on a flat bed scanner with a green background.
-```{r}
+```{r, fig.align="center"}
 f = system.file("images", "peanut_pod.jpg", package="Rigatoni")
 img = readImage(f)
 display(img, method="raster")
@@ -55,6 +55,8 @@ mythreshold
 The `get_huethr_values` function allows to click twice on the distribution. On the example below, the second peak represents the background. Click on both sides of the peak will return a vector of 2 values.
 ```{r, echo=FALSE, fig.align="center", fig.asp=0.8, fig.width=7}
 mythreshold <- get_huethr_values(img, return.values = FALSE)
+arrows(x0 = c(0.22,0.35), y1=c(0,0), x1 = c(0.22,0.35), y0 = c(10000,10000), length = 0.1, col = "red")
+text(x = c(0.22,0.35), y=c(15000,15000), labels = c("Click\nhere","and\nhere"), cex=0.5, col = "red")
 mythreshold <- c(60, 90)
 mythreshold
 ```
@@ -62,8 +64,13 @@ mythreshold
 
 Once the hue threshold values are determined it can be used to find features in the image using the `krnel` function
 
-```{r, eval=TRUE, echo=FALSE}
-pods<-krnel(img = img, resizw = 500, huethres = mythreshold, minsize = 100, maxsize = 10000, save.outline = F)
+```{r, eval=TRUE, echo=TRUE}
+pods<-krnel(img = img,
+            resizw = 1000,
+            huethres = mythreshold, 
+            minsize = 200,
+            maxsize = 20000,
+            save.outline = F)
 ```
 
 Note that the `img` parameter can either be an Image object previously obtained with `EBImage::readImage` or the name of an image file that is in your working directory (or it's full patch if located elsewhere).  
@@ -81,31 +88,53 @@ It is a list with three components:
 
 The features of the `pods` object can be plotted with the plot function: 
 
-```{r, echo=TRUE, fig.align="center"}
+```{r, echo=TRUE, fig.align="center", fig.asp=0.8, fig.width=7}
 plot(pods, plot.bbox = T)
 ```
 
 We can see that object #11 is the merger of two pods that were not separated on the scanner.  
 This artecfactual object can be excluded by decreasing `maxsize`.  
-Let's decrease it to 2000.  
+Let's decrease it to 10000.  
 
 We can also set `save.outline` to `TRUE` so that the analysed image will be saved in the same directory with detected objects outlines.  
-```{r, eval=FALSE}
-pods<-krnel(img = img, resizw = 500, huethres = mythreshold, minsize = 100, maxsize = 2000, save.outline = T, img.name = "peanut_pod")
+```{r, eval=FALSE, echo=T}
+pods<-krnel(img = img,
+            resizw = 1000,
+            huethres = mythreshold,
+            minsize = 200,
+            maxsize = 10000,
+            save.outline = T,
+            img.name = "peanut_pod")
 ```
-```{r, eval=TRUE, echo=FALSE}
-pods<-krnel(img = img, resizw = 500, huethres = mythreshold, minsize = 100, maxsize = 2000, save.outline = F)
-f = system.file("images", "peanut_pod.outline1.jpg", package="Rigatoni")
-img = readImage(f)
-display(img, method="raster")
+
+```{r, eval=TRUE, echo=FALSE, fig.align="center"}
+pods<-krnel(img = img, resizw = 1000, huethres = mythreshold, minsize = 200, maxsize = 10000, save.outline = F)
+f2 = system.file("images", "peanut_pod.outline1.jpg", package="Rigatoni")
+img2 = readImage(f)
+display(img2, method="raster")
 
 ```
 
 The resulting `pods` object no longer contains the 2 non separated pods.
 
-```{r, echo=TRUE, fig.align="center"}
+```{r, echo=TRUE, fig.align="center", fig.asp=0.8, fig.width=7}
 plot(pods, plot.bbox = T)
 ```
+
+
+Another, and recommended, option is to use the `watershed` parameter.
+```{r, eval=TRUE, fig.align="center", fig.asp=0.8, fig.width=7}
+pods<-krnel(img = img, 
+            resizw = 1000, 
+            huethres = mythreshold, 
+            minsize = 200, 
+            maxsize = 20000, 
+            save.outline = F, 
+            watershed = T)
+
+plot(pods, plot.bbox = T)
+```
+
 
 ## Working on many images
 
@@ -146,3 +175,5 @@ all_features <- do.call(rbind,
                             )
                         )
 ```
+
+

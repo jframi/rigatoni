@@ -75,15 +75,7 @@
     
 <p>Load the package</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">Rigatoni</span><span class="op">)</span>
-<span class="co">#&gt; Le chargement a nécessité le package : data.table</span>
-<span class="co">#&gt; Warning: le package 'data.table' a été compilé avec la version R 3.6.2</span>
-<span class="co">#&gt; Le chargement a nécessité le package : EBImage</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attachement du package : 'EBImage'</span>
-<span class="co">#&gt; The following object is masked from 'package:data.table':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     transpose</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">Rigatoni</span><span class="op">)</span></code></pre></div>
 <p>Set your working directory</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span><span class="op">(</span><span class="st">"/path/to/the/directory/that/contains/images/to/analyse"</span><span class="op">)</span></code></pre></div>
@@ -95,7 +87,7 @@
 <code class="sourceCode R"><span class="va">f</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"images"</span>, <span class="st">"peanut_pod.jpg"</span>, package<span class="op">=</span><span class="st">"Rigatoni"</span><span class="op">)</span>
 <span class="va">img</span> <span class="op">=</span> <span class="fu">readImage</span><span class="op">(</span><span class="va">f</span><span class="op">)</span>
 <span class="fu">display</span><span class="op">(</span><span class="va">img</span>, method<span class="op">=</span><span class="st">"raster"</span><span class="op">)</span></code></pre></div>
-<p><img src="Rigatoni_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<p><img src="Rigatoni_files/figure-html/unnamed-chunk-3-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>The first thing to do is to get a range of color (hue) values for the background of the image that will be further used for applying a color threshold.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mythreshold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_huethr_values.html">get_huethr_values</a></span><span class="op">(</span><span class="va">img</span><span class="op">)</span>
@@ -103,6 +95,13 @@
 <p>The <code>get_huethr_values</code> function allows to click twice on the distribution. On the example below, the second peak represents the background. Click on both sides of the peak will return a vector of 2 values. <img src="Rigatoni_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;"></p>
 <pre><code>#&gt; [1] 60 90</code></pre>
 <p>Once the hue threshold values are determined it can be used to find features in the image using the <code>krnel</code> function</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pods</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/krnel.html">krnel</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">img</span>,
+            resizw <span class="op">=</span> <span class="fl">1000</span>,
+            huethres <span class="op">=</span> <span class="va">mythreshold</span>, 
+            minsize <span class="op">=</span> <span class="fl">200</span>,
+            maxsize <span class="op">=</span> <span class="fl">20000</span>,
+            save.outline <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></code></pre></div>
 <p>Note that the <code>img</code> parameter can either be an Image object previously obtained with <code><a href="https://rdrr.io/pkg/EBImage/man/io.html">EBImage::readImage</a></code> or the name of an image file that is in your working directory (or it’s full patch if located elsewhere).<br>
 The <code>resizw</code> parameter allows to reduce image size by providing the width of the image that will be analyzed (height will be modified accordingly to respect h/w ratio). Reducing the size of the image improves the performance of features detection and is important when many images need to be analysed sequentially.<br>
 The <code>minsize</code> and <code>maxsize</code> parameters allow to fix the minimum and maximum size (area) of the objects that will be captured in the image. Note that the two parameters are expressed relatively to the resized image.</p>
@@ -115,30 +114,48 @@ It is a list with three components:</p>
 <li><p>params : a list with the analysis parameters. can be used for further plotting</p></li>
 </ul>
 <p>The features of the <code>pods</code> object can be plotted with the plot function:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">pods</span>, plot.bbox <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
-<p><img src="Rigatoni_files/figure-html/unnamed-chunk-7-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="Rigatoni_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>We can see that object #11 is the merger of two pods that were not separated on the scanner.<br>
 This artecfactual object can be excluded by decreasing <code>maxsize</code>.<br>
-Let’s decrease it to 2000.</p>
+Let’s decrease it to 10000.</p>
 <p>We can also set <code>save.outline</code> to <code>TRUE</code> so that the analysed image will be saved in the same directory with detected objects outlines.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pods</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/krnel.html">krnel</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">img</span>, resizw <span class="op">=</span> <span class="fl">500</span>, huethres <span class="op">=</span> <span class="va">mythreshold</span>, minsize <span class="op">=</span> <span class="fl">100</span>, maxsize <span class="op">=</span> <span class="fl">2000</span>, save.outline <span class="op">=</span> <span class="cn">T</span>, img.name <span class="op">=</span> <span class="st">"peanut_pod"</span><span class="op">)</span></code></pre></div>
-<p><img src="Rigatoni_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
-<p>The resulting <code>pods</code> object no longer contains the 2 non separated pods.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pods</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/krnel.html">krnel</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">img</span>,
+            resizw <span class="op">=</span> <span class="fl">1000</span>,
+            huethres <span class="op">=</span> <span class="va">mythreshold</span>,
+            minsize <span class="op">=</span> <span class="fl">200</span>,
+            maxsize <span class="op">=</span> <span class="fl">10000</span>,
+            save.outline <span class="op">=</span> <span class="cn">T</span>,
+            img.name <span class="op">=</span> <span class="st">"peanut_pod"</span><span class="op">)</span></code></pre></div>
+<p><img src="Rigatoni_files/figure-html/unnamed-chunk-9-1.png" width="700" style="display: block; margin: auto;"></p>
+<p>The resulting <code>pods</code> object no longer contains the 2 non separated pods.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">pods</span>, plot.bbox <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
-<p><img src="Rigatoni_files/figure-html/unnamed-chunk-10-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="Rigatoni_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;"></p>
+<p>Another, and recommended, option is to use the <code>watershed</code> parameter.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pods</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/krnel.html">krnel</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">img</span>, 
+            resizw <span class="op">=</span> <span class="fl">1000</span>, 
+            huethres <span class="op">=</span> <span class="va">mythreshold</span>, 
+            minsize <span class="op">=</span> <span class="fl">200</span>, 
+            maxsize <span class="op">=</span> <span class="fl">20000</span>, 
+            save.outline <span class="op">=</span> <span class="cn">F</span>, 
+            watershed <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">pods</span>, plot.bbox <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
+<p><img src="Rigatoni_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;"></p>
 </div>
 <div id="working-on-many-images" class="section level2">
 <h2 class="hasAnchor">
 <a href="#working-on-many-images" class="anchor"></a>Working on many images</h2>
 <p>If your working directory contains many images it is possible to analyse several or all of them at a time.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html">dir</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">".*.jpg$"</span><span class="op">)</span>
 <span class="co">#or files &lt;- c("file1.jpg", "file2.jpg", "file3.jpg")</span></code></pre></div>
 <p>To apply the <code>krnel</code> function to all the files listed in <code>files</code> and get the result in a list, we can use the lapply function.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">img_pods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="va">files</span>,
                    <span class="kw">function</span><span class="op">(</span><span class="va">a</span><span class="op">)</span> <span class="fu"><a href="../reference/krnel.html">krnel</a></span><span class="op">(</span>img <span class="op">=</span> <span class="va">a</span>,
                                      resizw <span class="op">=</span> <span class="fl">1000</span>,
@@ -148,10 +165,10 @@ Let’s decrease it to 2000.</p>
                                      save.outline <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>
                    <span class="op">)</span></code></pre></div>
 <p>We thus get a list of krnel objects. Let’s name the components of the list with image names.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">img_pods</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">files</span></code></pre></div>
 <p>To extract all features of all images into a single data.table with an extra column containing the name of the images :</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">all_features</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html">do.call</a></span><span class="op">(</span><span class="va">rbind</span>,
                         <span class="fu"><a href="https://rdrr.io/r/base/funprog.html">Map</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">a</span>, <span class="va">i</span><span class="op">)</span> <span class="fu">data.table</span><span class="op">(</span>Image<span class="op">=</span><span class="va">i</span>, <span class="va">a</span><span class="op">$</span><span class="va">features</span><span class="op">)</span>,
                             <span class="va">img_pods</span>,
