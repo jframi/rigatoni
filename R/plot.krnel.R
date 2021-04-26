@@ -18,7 +18,7 @@ plot.krnel<-function(x, label=TRUE, label.cex=0.6, label.col="red", plot.bbox=T,
     polygon(x$contours[[g]][,1],x$params$h-x$contours[[g]][,2],col = x$features$cols[g], border = NA)
   }
   if (label){
-    text(x = x$features$m.cx, y = x$params$h-x$features$m.cy, label=1:nrow(x$features), cex=label.cex, col = label.col)
+    text(x = x$features$m.cx, y = x$params$h-x$features$m.cy, label=names(x$contours), cex=label.cex, col = label.col)
   }
   if (plot.bbox){
     if (!is.null(x$bbox)){
