@@ -2,6 +2,9 @@
 
 S3method(plot,krnel)
 export(get_huethr_values)
+export(kernl_to_coo_list)
 export(krnel)
 export(krnellab)
+import(Momocs2)
+import(tibble)
 importFrom(grDevices,chull)

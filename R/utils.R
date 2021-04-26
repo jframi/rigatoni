@@ -72,3 +72,18 @@ getMinBBox <- function(xy) {
 
   return(list(pts=pts, width=heights[eMin], height=widths[eMin], angle=deg))
 }
+
+
+#' Convert a krnel object into a coo list from Momocs2 package
+#'
+#' @param x a krnel object as returned by krnel function
+#'
+#' @return a coo list
+#'
+#' @export
+#' @import Momocs2
+#' @import tibble
+#' @examples
+kernl_to_coo_list <- function(x){
+  coo_list(lapply(x$contours, function(a) new_coo_single(tibble(x=a[,1],y=a[,2]))))
+}
