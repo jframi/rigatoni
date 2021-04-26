@@ -78,7 +78,7 @@ The `resizw` parameter allows to reduce image size by providing the width of the
 The `minsize` and `maxsize` parameters allow to fix the minimum and maximum size (area) of the objects that will be captured in the image. Note that the two parameters are expressed relatively to the resized image.
 
 The object that is returned by the `krnel` function is of S3 class.. `krnel`  
-It is a list with three components:
+It is a list with four components:
 
 - features : a data.frame with as many rows as the number of detected features and description variables as returned by `EBImage::computeFeatures`. It also includes bounding box width and height aka Feret min and max diameter.
 - contours : a list with as many elements as the number of detected features Each element is a matrix with the coordinates of each feature.
@@ -110,7 +110,7 @@ pods<-krnel(img = img,
 ```{r, eval=TRUE, echo=FALSE, fig.align="center"}
 pods<-krnel(img = img, resizw = 1000, huethres = mythreshold, minsize = 200, maxsize = 10000, save.outline = F)
 f2 = system.file("images", "peanut_pod.outline1.jpg", package="Rigatoni")
-img2 = readImage(f)
+img2 = readImage(f2)
 display(img2, method="raster")
 
 ```

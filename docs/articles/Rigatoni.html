@@ -106,7 +106,7 @@
 The <code>resizw</code> parameter allows to reduce image size by providing the width of the image that will be analyzed (height will be modified accordingly to respect h/w ratio). Reducing the size of the image improves the performance of features detection and is important when many images need to be analysed sequentially.<br>
 The <code>minsize</code> and <code>maxsize</code> parameters allow to fix the minimum and maximum size (area) of the objects that will be captured in the image. Note that the two parameters are expressed relatively to the resized image.</p>
 <p>The object that is returned by the <code>krnel</code> function is of S3 class.. <code>krnel</code><br>
-It is a list with three components:</p>
+It is a list with four components:</p>
 <ul>
 <li><p>features : a data.frame with as many rows as the number of detected features and description variables as returned by <code><a href="https://rdrr.io/pkg/EBImage/man/computeFeatures.html">EBImage::computeFeatures</a></code>. It also includes bounding box width and height aka Feret min and max diameter.</p></li>
 <li><p>contours : a list with as many elements as the number of detected features Each element is a matrix with the coordinates of each feature.</p></li>
