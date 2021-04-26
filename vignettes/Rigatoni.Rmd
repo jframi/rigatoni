@@ -15,7 +15,7 @@ resource_files:
 
 ```{r, include = FALSE}
 ragg_png = function(...) {
-  ragg::agg_png(..., units = "in")
+  ragg::agg_png(..., units = "in", res = 144)
 }
 knitr::opts_chunk$set(dev = "ragg_png", fig.ext = "png")
 knitr::opts_chunk$set(
