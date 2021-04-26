@@ -17,7 +17,7 @@
 #' @export
 #'
 #' @examples
-krnel<- function(img, crop=NULL, resizw=NULL, huethres, minsize, maxsize, save.outline=F, img.name=NULL){
+krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, maxsize, save.outline=F, img.name=NULL){
 
   #mf<-match.call()
   #if(class(eval(mf$img))=="Image"){
@@ -38,6 +38,8 @@ krnel<- function(img, crop=NULL, resizw=NULL, huethres, minsize, maxsize, save.o
   }
   #resize
   if (!is.null(resizw)){
+    orig.w <- dim(img)[2]
+    orig.h <- dim(img)[1]
     img<-resize(img,w = resizw)
   } else {
     resizw <- dim(img)[2]
@@ -65,9 +67,22 @@ krnel<- function(img, crop=NULL, resizw=NULL, huethres, minsize, maxsize, save.o
   nmask = bwlabel(nmask)
 
   # filter on minsize
-  nmask[!nmask%in%(which(table(c(imageData(nmask)))>minsize)-1)]<-0
+  #nmask[!nmask%in%(which(table(c(imageData(nmask)))>minsize)-1)]<-0
+  nmask <- rmObjects(nmask,which(computeFeatures.shape(nmask)[,"s.area"]<minsize))
+  ## filter on maxsize
+  #nmask[!nmask%in%(names(which(table(c(imageData(nmask)))<maxsize)))]<-0
+
+  if (watershed){
+    dmap = distmap(nmask)
+    nmask = watershed(dmap)
+    # filter on minsize
+    #nmask[!nmask%in%(which(table(c(imageData(nmask)))>minsize)-1)]<-0
+    nmask <- rmObjects(nmask,which(computeFeatures.shape(nmask)[,"s.area"]<minsize))
+  }
   # filter on maxsize
-  nmask[!nmask%in%(names(which(table(c(imageData(nmask)))<maxsize)))]<-0
+  #nmask[!nmask%in%(names(which(table(c(imageData(nmask)))<maxsize)))]<-0
+  nmask <- rmObjects(nmask,which(computeFeatures.shape(nmask)[,"s.area"]>maxsize))
+
   # get features
   nmask.shp<-computeFeatures.shape(nmask)
   nmask.mom<-computeFeatures.moment(nmask)
@@ -93,8 +108,11 @@ krnel<- function(img, crop=NULL, resizw=NULL, huethres, minsize, maxsize, save.o
             params=list(crops=crop,
                         w=dim(img)[1],
                         h=dim(img)[2],
+                        orig.w=orig.w,
+                        orig.h=orig.h,
                         huethres=huethres,
                         minsize=minsize,
+                        maxsize=maxsize,
                         image.name=img.name))
   if (save.outline){
     writeImage(paintObjects(nmask,img,thick = resizw>1500),
