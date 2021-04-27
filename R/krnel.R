@@ -37,12 +37,12 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
     img <- img[crop[1]:crop[2], crop[3]:crop[4],1:3]
   }
   #resize
+  orig.w <- dim(img)[1]
+  orig.h <- dim(img)[2]
   if (!is.null(resizw)){
-    orig.w <- dim(img)[2]
-    orig.h <- dim(img)[1]
     img<-resize(img,w = resizw)
   } else {
-    resizw <- dim(img)[2]
+    resizw <- dim(img)[1]
   }
 
   # Make rgb matrix
