@@ -47,8 +47,10 @@ getMinBBox <- function(xy) {
   }
 
   ## extreme projections for min-area rect in subspace coordinates
-  ## hull edge leading to minimum-area
-  eMin  <- which.min(widths*heights)
+  ### hull edge leading to minimum-area
+  #eMin  <- which.min(widths*heights)
+  ## hull edge leading to maximum difference between width and height
+  eMin  <- which.max(abs(widths-heights))
   hProj <- rbind(   rangeH[eMin, ], 0)
   oProj <- rbind(0, rangeO[eMin, ])
 
