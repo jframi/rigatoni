@@ -1,16 +1,14 @@
 #' Rotating calipers algorithm
 #'
 #' @description
-#' Calculates the minimum oriented bounding box using the
+#' Calculates the most rectangle bounding box using the
 #' rotating calipers algorithm.
-#' This is the [flightplanning::getMinBBox] function from the flightplanning package <https://github.com/caiohamamura/flightplanning-R>
+#' Derived from the [flightplanning::getMinBBox] function from the flightplanning package <https://github.com/caiohamamura/flightplanning-R>
 #'
-#' @param xy A matrix of xy values from which to calculate the minimum oriented
-#' bounding box.
-#' @author Caio Hamamura <caiohamamura@gmail.com>
+#' @param xy A matrix of xy values from which to calculate the bounding box.
 #' @noRd
 #' @importFrom grDevices chull
-getMinBBox <- function(xy) {
+getBBox <- function(xy) {
   stopifnot(is.matrix(xy), is.numeric(xy), nrow(xy) >= 2, ncol(xy) == 2)
 
   ## rotating calipers algorithm using the convex hull

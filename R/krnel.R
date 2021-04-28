@@ -96,8 +96,8 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   nmask.cont<-ocontour(nmask)
   cols<-rgb(nmask.basr[,1],nmask.basg[,1],nmask.basb[,1])
 
-  nmask.bbox <- lapply(nmask.cont, getMinBBox)
-  nmask.bbox.wh <- do.call(rbind,lapply(nmask.bbox, function(a) data.table(bbox.width=a$width, bbox.height=a$height)))
+  nmask.bbox <- lapply(nmask.cont, getBBox)
+  nmask.bbox.wh <- do.call(rbind,lapply(nmask.bbox, function(a) data.table(bbox.width=ifelse(a$width<a$height, a$width, a$height), bbox.height=ifelse(a$width<a$height, a$height, a$width))))
   ret<-list(features= data.table(nmask.shp,
                                  nmask.bbox.wh,
                                  nmask.mom,
