@@ -45,22 +45,30 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
     resizw <- dim(img)[1]
   }
 
-  # Make rgb matrix
-  #rgb<-rbind(c(img[,,1]),c(img[,,2]),c(img[,,3]))
-  rgb<-matrix(c(c(img[,,1]),c(img[,,2]),c(img[,,3])),nrow = 3, byrow = T)
-  # convert to hsv
-  x<-rgb2hsv(rgb)
-  # get h component
-  xh<-matrix(x[1,],nrow = resizw)
-  xht<-xh
-  # hue threshold
-  minhue<-huethres[1]
-  maxhue<-huethres[2]
-  xht[xht<=(minhue/255)]<-0
-  xht[xht>=(maxhue/255)]<-0
-  xht[xht>(minhue/255) & xht<(maxhue/255)]<-1
-  # make it an image
-  xhti<-as.Image(xht)
+  if (blackbg == TRUE){
+    img@colormode <- Grayscale
+    xhti <- (1-(img>otsu(img)))
+    if (numberOfFrames(img, type="total")>1) {
+      xhti <- xhti[,,1]
+    }
+  }else{
+    # Make rgb matrix
+    #rgb<-rbind(c(img[,,1]),c(img[,,2]),c(img[,,3]))
+    rgb<-matrix(c(c(img[,,1]),c(img[,,2]),c(img[,,3])),nrow = 3, byrow = T)
+    # convert to hsv
+    x<-rgb2hsv(rgb)
+    # get h component
+    xh<-matrix(x[1,],nrow = resizw)
+    xht<-xh
+    # hue threshold
+    minhue<-huethres[1]
+    maxhue<-huethres[2]
+    xht[xht<=(minhue/255)]<-0
+    xht[xht>=(maxhue/255)]<-0
+    xht[xht>(minhue/255) & xht<(maxhue/255)]<-1
+    # make it an image
+    xhti<-as.Image(xht)
+  }
 
   # get mask
   nmask = fillHull(1-xhti)
