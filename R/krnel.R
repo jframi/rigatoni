@@ -15,9 +15,8 @@
 #' * params : a list with the analysis parameters. can be used for further plotting
 #' @md
 #' @export
-#'
 #' @examples
-krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, maxsize, save.outline=F, img.name=NULL){
+krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, maxsize, save.outline=F, img.name=NULL, blackbg=F, ws.avg=F){
 
   #mf<-match.call()
   #if(class(eval(mf$img))=="Image"){
@@ -106,7 +105,8 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
 
   nmask.bbox <- lapply(nmask.cont, getBBox)
   nmask.bbox.wh <- do.call(rbind,lapply(nmask.bbox, function(a) data.table(bbox.width=ifelse(a$width<a$height, a$width, a$height), bbox.height=ifelse(a$width<a$height, a$height, a$width))))
-  ret<-list(features= data.table(nmask.shp,
+  ret<-list(features= data.table(id=as.numeric(names(nmask.cont)),
+                                 nmask.shp,
                                  nmask.bbox.wh,
                                  nmask.mom,
                                  nmask.bas,
@@ -122,6 +122,22 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
                         minsize=minsize,
                         maxsize=maxsize,
                         image.name=img.name))
+  if (ws.avg){
+    dmap = distmap(nmask)
+    nmask = watershed(dmap)
+    nmask <- rmObjects(nmask,which(computeFeatures.shape(nmask)[,"s.area"]<minsize))
+    nmask.ws.mom<-computeFeatures.moment(nmask)
+    nmask.ws.cont<-ocontour(nmask)
+    nmask.ws.bbox <- lapply(nmask.ws.cont, getBBox)
+    nmask.ws.bbox.wh <- do.call(rbind,lapply(nmask.ws.bbox, function(a) data.table(bbox.width=ifelse(a$width<a$height, a$width, a$height), bbox.height=ifelse(a$width<a$height, a$height, a$width))))
+    ret.ws <- data.table(nmask.ws.mom,nmask.ws.bbox.wh)
+    ret.ws[, parent:=apply(ret.ws[,.(m.cx,m.cy)], 1, function(a) which(unlist(lapply(ret$bbox, function(b) is_p_in_rectangle(pt=a, r=b$pts)))))]
+    ret.ws2 <- ret.ws[, .(bbox.width.ws.avg=mean(bbox.width), bbox.height.ws.avg=mean(bbox.height), bbox.width.ws.sum=sum(bbox.width), bbox.height.ws.sum=sum(bbox.height)), parent]
+    ret$features <- ret$features[ret.ws2, on=c(id="parent")]
+    cont.ids <- ret.ws[,.(id=1:.N,parent)][,.(ids=list(id)),parent][order(parent)]
+    ret$ws.contours <- lapply(1:nrow(cont.ids), function(a) nmask.ws.cont[unlist(cont.ids[a, ids])])
+    ret$ws.bbox <- lapply(1:nrow(cont.ids), function(a) nmask.ws.bbox[unlist(cont.ids[a, ids])])
+  }
   if (save.outline){
     writeImage(paintObjects(nmask,img,thick = resizw>1500),
                files=paste0(img.name,".outline.jpg"),

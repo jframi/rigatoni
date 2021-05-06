@@ -87,3 +87,37 @@ getBBox <- function(xy) {
 kernl_to_coo_list <- function(x){
   coo_list(lapply(x$contours, function(a) new_coo_single(tibble(x=a[,1],y=a[,2]))))
 }
+
+
+
+#' Check if a point is in a rectangle
+#'
+#' @param pt
+#' @param r
+#'
+#' @return
+#' @noRd
+#'
+#' @examples
+is_p_in_rectangle <- function(pt, r){
+  xA <- round(r[1,1],0)
+  xB <- round(r[2,1],0)
+  xC <- round(r[3,1],0)
+  xD <- round(r[4,1],0)
+  yA <- round(r[1,2],0)
+  yB <- round(r[2,2],0)
+  yC <- round(r[3,2],0)
+  yD <- round(r[4,2],0)
+  xP <- round(pt[1],0)
+  yP <- round(pt[2],0)
+
+  ABCD = 0.5 * abs((yA - yC)*(xD - xB) + (yB - yD)*(xA - xC))
+
+  ABP = 0.5 * abs(xA*(yB - yP) + xB*(yP - yA) + xP*(yA - yB))
+  BCP = 0.5 * abs(xB*(yC - yP) + xC*(yP - yB) + xP*(yB - yC))
+  CDP = 0.5 * abs(xC*(yD - yP) + xD*(yP - yC) + xP*(yC - yD))
+  DAP = 0.5 * abs(xD*(yA - yP) + xA*(yP - yD) + xP*(yD - yA))
+  #return(round(ABCD,3) == round(ABP + BCP + CDP + DAP, 3))
+  #return(abs(ABCD - (ABP + BCP + CDP + DAP)) <2)
+  return(ABCD == (ABP + BCP + CDP + DAP))
+}
