@@ -7,6 +7,9 @@
 #' @param minsize the minimum size of features to be considered, in pixel, as determined on the resized image
 #' @param maxsize the maximum size of features to be considered, in pixel, as determined on the resized image
 #' @param save.outline boolean, should an outline image be saved in the same directory
+#' @param img.name name of the image. This is useful in the case img is an Image object and save.outline is TRUE. This will be used for the name of the outline file.
+#' @param blackbg behave differently in case the background is black
+#' @param ws.avg watershed average : this allows to perform a watershed after a feature detection with no watershed, and to compute for each feature bbox width/height average and sum on the different sub-features obtained through watershed
 #'
 #' @return the function will return krnel object, ie. a list with three components
 #' * features : a data.frame with as many rows as the number of detected features and description variables as returned by EBImage::computeFeatures. It also includes bounding box width and height aka Feret min and max diameter.
@@ -121,7 +124,11 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
                         huethres=huethres,
                         minsize=minsize,
                         maxsize=maxsize,
-                        image.name=img.name))
+                        watershed=watershed,
+                        save.outline=save.outline,
+                        image.name=img.name,
+                        blackbg=blackbg,
+                        ws.avg=ws.avg))
   if (ws.avg){
     dmap = distmap(nmask)
     nmask = watershed(dmap)
