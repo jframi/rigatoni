@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">Rigatoni</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7</span>
       </span>
     </div>
 
@@ -118,7 +118,8 @@
     </div>
 
     <pre class="usage"><span class='fu'>krnel</span><span class='op'>(</span><span class='va'>img</span>, crop <span class='op'>=</span> <span class='cn'>NULL</span>, resizw <span class='op'>=</span> <span class='cn'>NULL</span>, watershed <span class='op'>=</span> <span class='cn'>F</span>, <span class='va'>huethres</span>,
-  <span class='va'>minsize</span>, <span class='va'>maxsize</span>, save.outline <span class='op'>=</span> <span class='cn'>F</span>, img.name <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+  <span class='va'>minsize</span>, <span class='va'>maxsize</span>, save.outline <span class='op'>=</span> <span class='cn'>F</span>, img.name <span class='op'>=</span> <span class='cn'>NULL</span>, blackbg <span class='op'>=</span> <span class='cn'>F</span>,
+  ws.avg <span class='op'>=</span> <span class='cn'>F</span><span class='op'>)</span></pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -151,6 +152,18 @@
       <th>save.outline</th>
       <td><p>boolean, should an outline image be saved in the same directory</p></td>
     </tr>
+    <tr>
+      <th>img.name</th>
+      <td><p>name of the image. This is useful in the case img is an Image object and save.outline is TRUE. This will be used for the name of the outline file.</p></td>
+    </tr>
+    <tr>
+      <th>blackbg</th>
+      <td><p>behave differently in case the background is black</p></td>
+    </tr>
+    <tr>
+      <th>ws.avg</th>
+      <td><p>watershed average : this allows to perform a watershed after a feature detection with no watershed, and to compute for each feature bbox width/height average and sum on the different sub-features obtained through watershed</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -160,6 +173,9 @@
 <li><p>contours : a list with as many elements as the number of detected features. Each element is a matrix with the coordinates of each feature.</p></li>
 <li><p>bbox : a list with as many elements as the number of detected features. Each element is a list with 4 components: $pts that contains the coordinates of each corner of the bounding box, $width, $height, and $angle</p></li>
 <li><p>params : a list with the analysis parameters. can be used for further plotting</p></li>
+<li><p>ws.contours : if ws.avg=T. a list as many elements as the number of detected main features. Each elementis a list of matrix with the coordinates of each sub-features.</p></li>
+<li><p>ws.bbox : if ws.avg=T. The same with bounding boxes</p></li>
+<li><p>ws.pois : if ws.avg=T. The same with point of inaccessibility</p></li>
 </ul>
 
     
