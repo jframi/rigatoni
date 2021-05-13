@@ -16,7 +16,11 @@
 #' * contours : a list with as many elements as the number of detected features. Each element is a matrix with the coordinates of each feature.
 #' * bbox : a list with as many elements as the number of detected features. Each element is a list with 4 components: $pts that contains the coordinates of each corner of the bounding box, $width, $height, and $angle
 #' * params : a list with the analysis parameters. can be used for further plotting
+#' * ws.contours : if ws.avg=T. a list as many elements as the number of detected main features. Each elementis a list of matrix with the coordinates of each sub-features.
+#' * ws.bbox : if ws.avg=T. The same with bounding boxes
+#' * ws.pois : if ws.avg=T. The same with point of inaccessibility
 #' @md
+#' @importFrom polylabelr poi
 #' @export
 #' @examples
 krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, maxsize, save.outline=F, img.name=NULL, blackbg=F, ws.avg=F){
@@ -30,7 +34,7 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
 
   if (!class(img)=="Image"){
     img.name <- img
-    img = readImage(img)
+    img = suppressWarnings(readImage(img))
   } else {
     if (save.outline==T & is.null(img.name)) stop("If img is an EBImage image object and save.outline=T you should provide an image.name for the output file")
   }
@@ -106,11 +110,19 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   nmask.cont<-ocontour(nmask)
   cols<-rgb(nmask.basr[,1],nmask.basg[,1],nmask.basb[,1])
 
+  # Compute bounding boxes (bbox)
   nmask.bbox <- lapply(nmask.cont, getBBox)
+  # bbox width should always be smaller than height
   nmask.bbox.wh <- do.call(rbind,lapply(nmask.bbox, function(a) data.table(bbox.width=ifelse(a$width<a$height, a$width, a$height), bbox.height=ifelse(a$width<a$height, a$height, a$width))))
+
+  # Compute the pole of inaccessibility to get the Maximum inscribed Circle
+  pois<-setnames(data.table(do.call(rbind,lapply(lapply(nmask.cont, polylabelr::poi), unlist))), c("poi.x","poi.y","poi.dist"))
+
+  # build the krnel object to return
   ret<-list(features= data.table(id=as.numeric(names(nmask.cont)),
                                  nmask.shp,
                                  nmask.bbox.wh,
+                                 pois,
                                  nmask.mom,
                                  nmask.bas,
                                  cols),
@@ -129,21 +141,43 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
                         image.name=img.name,
                         blackbg=blackbg,
                         ws.avg=ws.avg))
+
+  # If ws.avg is true, redo an analysis with watershed, link sub-features to features detected withous watershed and compute stats
   if (ws.avg){
+    # watershed
     dmap = distmap(nmask)
     nmask.ws = watershed(dmap)
+    # filter on minsize after watershed
     nmask.ws <- rmObjects(nmask.ws,which(computeFeatures.shape(nmask.ws)[,"s.area"]<minsize))
+    # do measurements on watershed sub-features
     nmask.ws.mom<-computeFeatures.moment(nmask.ws)
     nmask.ws.cont<-ocontour(nmask.ws)
+    # Compute bounding boxes (bbox)
     nmask.ws.bbox <- lapply(nmask.ws.cont, getBBox)
     nmask.ws.bbox.wh <- do.call(rbind,lapply(nmask.ws.bbox, function(a) data.table(bbox.width=ifelse(a$width<a$height, a$width, a$height), bbox.height=ifelse(a$width<a$height, a$height, a$width))))
-    ret.ws <- data.table(nmask.ws.mom,nmask.ws.bbox.wh)
+    # Compute the pole of inaccessibility to get the Maximum inscribed Circle
+    pois.ws<-setnames(data.table(do.call(rbind,lapply(lapply(nmask.ws.cont, polylabelr::poi), unlist))), c("poi.x","poi.y","poi.dist"))
+    # Construct a data.table with sub-features measurements
+    ret.ws <- data.table(nmask.ws.mom,nmask.ws.bbox.wh,pois.ws)
+    # Find the parent feature using bounding boxes of features detected before watershed and the is_p_in_rectangle applied to centroids of sub-features
     ret.ws[, parent:=apply(ret.ws[,.(m.cx,m.cy)], 1, function(a) which(unlist(lapply(ret$bbox, function(b) is_p_in_rectangle(pt=a, r=b$pts)))))]
-    ret.ws2 <- ret.ws[, .(bbox.width.ws.avg=mean(bbox.width), bbox.height.ws.avg=mean(bbox.height), bbox.width.ws.sum=sum(bbox.width), bbox.height.ws.sum=sum(bbox.height)), parent]
+    # Compute stats group by parent feature
+    ret.ws2 <- ret.ws[, .(bbox.width.ws.avg=mean(bbox.width),
+                          bbox.height.ws.avg=mean(bbox.height),
+                          bbox.width.ws.sum=sum(bbox.width),
+                          bbox.height.ws.sum=sum(bbox.height),
+                          poi.dist.max=max(poi.dist),
+                          poi.dist.min=min(poi.dist),
+                          poi.dist.avg=mean(poi.dist)), parent]
+    # Join the new parameters with the ones obtained previously
     ret$features <- ret$features[ret.ws2, on=c(id="parent")]
+    # Output the contours of the ws sub-features in final krnel object
     cont.ids <- ret.ws[,.(id=1:.N,parent)][,.(ids=list(id)),parent][order(parent)]
     ret$ws.contours <- lapply(1:nrow(cont.ids), function(a) nmask.ws.cont[unlist(cont.ids[a, ids])])
+    # Output the bounding boxes of the ws sub-features in final krnel object
     ret$ws.bbox <- lapply(1:nrow(cont.ids), function(a) nmask.ws.bbox[unlist(cont.ids[a, ids])])
+    # Output the points of inaccessibility of the ws sub-features in final krnel object
+    ret$ws.pois <- ret.ws[,.(parent, poi.x,poi.y,poi.dist)]
   }
   if (save.outline){
     writeImage(paintObjects(nmask,img,thick = resizw>1500),

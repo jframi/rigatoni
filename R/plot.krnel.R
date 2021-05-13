@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-plot.krnel<-function(x, label=TRUE, label.cex=0.6, label.col="red", plot.bbox=T, bbox.col="blue", title=T, plot.radii=T, plot.ellipse=T, plot.ws.bbox=F, ws.bbox.col="pink"){
+plot.krnel<-function(x, label=TRUE, label.cex=0.6, label.col="red", plot.bbox=T, bbox.col="blue", title=T, plot.radii=T, plot.ellipse=T, plot.ws.bbox=F, ws.bbox.col="pink", plot.pois=F, plot.ws.pois=F, poi.col="lightblue", poi.ws.col="lightblue"){
   if (title){
     plot(0,0, type="n",xlim=c(0,x$params$w),ylim=c(0,x$params$h), xlab="", ylab="", asp = 1, main=x$params$image.name)
   }else{
@@ -52,6 +52,11 @@ plot.krnel<-function(x, label=TRUE, label.cex=0.6, label.col="red", plot.bbox=T,
       if (!is.null(x$ws.bbox)){
         noret <- lapply(x$ws.bbox, function(b) lapply(b, function(a) polygon(a$pts[,1], x$params$h-a$pts[,2], border = ws.bbox.col)))
       }
-
+  }
+  if (plot.pois){
+    noret <- apply(x$features[,.(id,poi.x,poi.y,poi.dist)],1, function(pois) plotrix::draw.ellipse(pois[2],x$params$h-pois[3],a = pois[4],b=pois[4], col = poi.col))
+  }
+  if (plot.ws.pois){
+    noret <- apply(x$ws.pois,1, function(pois) plotrix::draw.ellipse(pois[2],x$params$h-pois[3],a = pois[4],b=pois[4], col = poi.ws.col))
   }
 }
