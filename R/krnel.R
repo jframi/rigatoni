@@ -170,7 +170,16 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
                           poi.dist.min=min(poi.dist),
                           poi.dist.avg=mean(poi.dist)), parent]
     # Join the new parameters with the ones obtained previously
-    ret$features <- ret$features[ret.ws2, on=c(id="parent")]
+    #ret$features <- ret$features[ret.ws2, on=c(id="parent")]
+    ret$features <- ret.ws2[ret$features, on=c(parent="id")]
+    setnames(ret$features, old="parent", new="id")
+    ret$features[is.na(bbox.width.ws.avg), `:=`(bbox.width.ws.avg=bbox.width,
+                                                bbox.height.ws.avg=bbox.height,
+                                                bbox.width.ws.sum=bbox.width,
+                                                bbox.height.ws.sum=bbox.height,
+                                                poi.dist.max=poi.dist,
+                                                poi.dist.min=poi.dist,
+                                                poi.dist.avg=poi.dist)]
     # Output the contours of the ws sub-features in final krnel object
     cont.ids <- ret.ws[,.(id=1:.N,parent)][,.(ids=list(id)),parent][order(parent)]
     ret$ws.contours <- lapply(1:nrow(cont.ids), function(a) nmask.ws.cont[unlist(cont.ids[a, ids])])
