@@ -89,7 +89,13 @@ It is a list with four components:
 The features of the `pods` object can be plotted with the plot function: 
 
 ```{r, echo=TRUE, fig.align="center", fig.asp=0.8, fig.width=7}
-plot(pods, plot.bbox = T)
+plot(pods,
+     plot.bbox=T,
+     plot.radii = F,
+     plot.ellipse = F,
+     plot.ws.pois = F,
+     plot.pois = F,
+     label.cex = 0.8)
 ```
 
 We can see that object #11 is the merger of two pods that were not separated on the scanner.  
@@ -118,7 +124,13 @@ display(img2, method="raster")
 The resulting `pods` object no longer contains the 2 non separated pods.
 
 ```{r, echo=TRUE, fig.align="center", fig.asp=0.8, fig.width=7}
-plot(pods, plot.bbox = T)
+plot(pods,
+     plot.bbox = T,
+     plot.radii = F,
+     plot.ellipse = F,
+     plot.ws.pois = F,
+     plot.pois = F,
+     label.cex = 0.8)
 ```
 
 
@@ -132,7 +144,13 @@ pods<-krnel(img = img,
             save.outline = F, 
             watershed = T)
 
-plot(pods, plot.bbox = T)
+plot(pods,
+     plot.bbox = T,
+     plot.radii = F,
+     plot.ellipse = F,
+     plot.ws.pois = F,
+     plot.pois = F,
+     label.cex = 0.8)
 ```
 
 

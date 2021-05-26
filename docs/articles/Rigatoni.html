@@ -115,7 +115,13 @@ It is a list with four components:</p>
 </ul>
 <p>The features of the <code>pods</code> object can be plotted with the plot function:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">pods</span>, plot.bbox <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">pods</span>,
+     plot.bbox<span class="op">=</span><span class="cn">T</span>,
+     plot.radii <span class="op">=</span> <span class="cn">F</span>,
+     plot.ellipse <span class="op">=</span> <span class="cn">F</span>,
+     plot.ws.pois <span class="op">=</span> <span class="cn">F</span>,
+     plot.pois <span class="op">=</span> <span class="cn">F</span>,
+     label.cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></code></pre></div>
 <p><img src="Rigatoni_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>We can see that object #11 is the merger of two pods that were not separated on the scanner.<br>
 This artecfactual object can be excluded by decreasing <code>maxsize</code>.<br>
@@ -132,7 +138,13 @@ Let’s decrease it to 10000.</p>
 <p><img src="Rigatoni_files/figure-html/unnamed-chunk-9-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>The resulting <code>pods</code> object no longer contains the 2 non separated pods.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">pods</span>, plot.bbox <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">pods</span>,
+     plot.bbox <span class="op">=</span> <span class="cn">T</span>,
+     plot.radii <span class="op">=</span> <span class="cn">F</span>,
+     plot.ellipse <span class="op">=</span> <span class="cn">F</span>,
+     plot.ws.pois <span class="op">=</span> <span class="cn">F</span>,
+     plot.pois <span class="op">=</span> <span class="cn">F</span>,
+     label.cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></code></pre></div>
 <p><img src="Rigatoni_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>Another, and recommended, option is to use the <code>watershed</code> parameter.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
@@ -144,7 +156,13 @@ Let’s decrease it to 10000.</p>
             save.outline <span class="op">=</span> <span class="cn">F</span>, 
             watershed <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">pods</span>, plot.bbox <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="va">pods</span>,
+     plot.bbox <span class="op">=</span> <span class="cn">T</span>,
+     plot.radii <span class="op">=</span> <span class="cn">F</span>,
+     plot.ellipse <span class="op">=</span> <span class="cn">F</span>,
+     plot.ws.pois <span class="op">=</span> <span class="cn">F</span>,
+     plot.pois <span class="op">=</span> <span class="cn">F</span>,
+     label.cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></code></pre></div>
 <p><img src="Rigatoni_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;"></p>
 </div>
 <div id="working-on-many-images" class="section level2">

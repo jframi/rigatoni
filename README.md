@@ -16,8 +16,16 @@ Install dependencies from CRAN
 
 ``` r
 install.packages("data.table")
-install.packages("EBImage")
+install.packages("polylabelr")
 install.packages("devtools")
+```
+
+Install dependencies from Bioconductor
+
+``` r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("EBImage")
 ```
 
 Then install Rigatoni from github
