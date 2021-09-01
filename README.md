@@ -20,6 +20,12 @@ install.packages("polylabelr")
 install.packages("devtools")
 ```
 
+Install dependencies from github
+
+``` r
+devtools::install_github("MomX/Momocs2")
+```
+
 Install dependencies from Bioconductor
 
 ``` r
