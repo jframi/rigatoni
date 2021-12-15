@@ -6,9 +6,10 @@
 #' @param huethres a numeric vector in the form c(Huemin, Huemax) to define Hue threshold. Can be easily determined using the get_huethr_values function
 #' @param minsize the minimum size of features to be considered, in pixel, as determined on the resized image
 #' @param maxsize the maximum size of features to be considered, in pixel, as determined on the resized image
-#' @param save.outline boolean, should an outline image be saved in the same directory
+#' @param save.outline boolean, should an outline image be saved in the same directory?
 #' @param img.name name of the image. This is useful in the case img is an Image object and save.outline is TRUE. This will be used for the name of the outline file.
 #' @param blackbg behave differently in case the background is black
+#' @param bw boolean, is it a black and white (greyscale) image? In this case huethres is not required.
 #' @param ws.avg watershed average : this allows to perform a watershed after a feature detection with no watershed, and to compute for each feature bbox width/height average and sum on the different sub-features obtained through watershed
 #'
 #' @return the function will return krnel object, ie. a list with three components
@@ -23,7 +24,7 @@
 #' @importFrom polylabelr poi
 #' @export
 #' @examples
-krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, maxsize, save.outline=F, img.name=NULL, blackbg=F, ws.avg=F){
+krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, maxsize, save.outline=F, img.name=NULL, blackbg=F, ws.avg=F, bw=F){
 
   #mf<-match.call()
   #if(class(eval(mf$img))=="Image"){
@@ -31,7 +32,9 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   #}else{
   #  img.name<-eval(mf$img)
   #}
-
+  if (bw & missing(huethres)){
+    huethres <- c(0,0)
+  }
   if (!class(img)=="Image"){
     img.name <- img
     img = suppressWarnings(readImage(img))
@@ -40,7 +43,11 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   }
   #crop
   if (!is.null(crop)){
-    img <- img[crop[1]:crop[2], crop[3]:crop[4],1:3]
+    if (numberOfFrames(img)==1){
+      img <- img[crop[1]:crop[2], crop[3]:crop[4]]
+    } else{
+      img <- img[crop[1]:crop[2], crop[3]:crop[4],1:dim(img)[3]]
+    }
   }
   #resize
   orig.w <- dim(img)[1]
@@ -50,30 +57,41 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   } else {
     resizw <- dim(img)[1]
   }
-
-  if (blackbg == TRUE){
-    img@colormode <- Grayscale
-    xhti <- (1-(img>otsu(img)))
-    if (numberOfFrames(img, type="total")>1) {
-      xhti <- xhti[,,1]
+  if (bw){
+      img@colormode <- Grayscale
+      if (blackbg == TRUE){
+        xhti <- (1-(img>otsu(img)))
+      } else {
+        xhti <- img>otsu(img)
+      }
+      if (numberOfFrames(img, type="total")>1) {
+        xhti <- xhti[,,1]
+      }
+    } else {
+    if (blackbg == TRUE){
+      img@colormode <- Grayscale
+      xhti <- (1-(img>otsu(img)))
+      if (numberOfFrames(img, type="total")>1) {
+        xhti <- xhti[,,1]
+      }
+    }else{
+      # Make rgb matrix
+      #rgb<-rbind(c(img[,,1]),c(img[,,2]),c(img[,,3]))
+      rgb<-matrix(c(c(img[,,1]),c(img[,,2]),c(img[,,3])),nrow = 3, byrow = T)
+      # convert to hsv
+      x<-rgb2hsv(rgb)
+      # get h component
+      xh<-matrix(x[1,],nrow = resizw)
+      xht<-xh
+      # hue threshold
+      minhue<-huethres[1]
+      maxhue<-huethres[2]
+      xht[xht<=(minhue/255)]<-0
+      xht[xht>=(maxhue/255)]<-0
+      xht[xht>(minhue/255) & xht<(maxhue/255)]<-1
+      # make it an image
+      xhti<-as.Image(xht)
     }
-  }else{
-    # Make rgb matrix
-    #rgb<-rbind(c(img[,,1]),c(img[,,2]),c(img[,,3]))
-    rgb<-matrix(c(c(img[,,1]),c(img[,,2]),c(img[,,3])),nrow = 3, byrow = T)
-    # convert to hsv
-    x<-rgb2hsv(rgb)
-    # get h component
-    xh<-matrix(x[1,],nrow = resizw)
-    xht<-xh
-    # hue threshold
-    minhue<-huethres[1]
-    maxhue<-huethres[2]
-    xht[xht<=(minhue/255)]<-0
-    xht[xht>=(maxhue/255)]<-0
-    xht[xht>(minhue/255) & xht<(maxhue/255)]<-1
-    # make it an image
-    xhti<-as.Image(xht)
   }
 
   # get mask
@@ -104,11 +122,15 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   #nmask.basr<-computeFeatures.basic(nmask,channel(img,"r"))
   #nmask.basg<-computeFeatures.basic(nmask,channel(img,"g"))
   #nmask.basb<-computeFeatures.basic(nmask,channel(img,"b"))
-  nmask.basr<-computeFeatures.basic(nmask,img[,,1])
-  nmask.basg<-computeFeatures.basic(nmask,img[,,2])
-  nmask.basb<-computeFeatures.basic(nmask,img[,,3])
+  if (numberOfFrames(img)>=3){
+    nmask.basr<-computeFeatures.basic(nmask,img[,,1])
+    nmask.basg<-computeFeatures.basic(nmask,img[,,2])
+    nmask.basb<-computeFeatures.basic(nmask,img[,,3])
+    cols<-rgb(nmask.basr[,1],nmask.basg[,1],nmask.basb[,1])
+  } else {
+    cols <- rgb(nmask.bas[,1],nmask.bas[,1],nmask.bas[,1])
+  }
   nmask.cont<-ocontour(nmask)
-  cols<-rgb(nmask.basr[,1],nmask.basg[,1],nmask.basb[,1])
 
   # Compute bounding boxes (bbox)
   nmask.bbox <- lapply(nmask.cont, getBBox)
@@ -139,6 +161,7 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
                         watershed=watershed,
                         save.outline=save.outline,
                         image.name=img.name,
+                        bw=bw,
                         blackbg=blackbg,
                         ws.avg=ws.avg))
 
