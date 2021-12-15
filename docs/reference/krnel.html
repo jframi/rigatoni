@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">Rigatoni</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.8</span>
       </span>
     </div>
 
@@ -119,7 +119,7 @@
 
     <pre class="usage"><span class='fu'>krnel</span><span class='op'>(</span><span class='va'>img</span>, crop <span class='op'>=</span> <span class='cn'>NULL</span>, resizw <span class='op'>=</span> <span class='cn'>NULL</span>, watershed <span class='op'>=</span> <span class='cn'>F</span>, <span class='va'>huethres</span>,
   <span class='va'>minsize</span>, <span class='va'>maxsize</span>, save.outline <span class='op'>=</span> <span class='cn'>F</span>, img.name <span class='op'>=</span> <span class='cn'>NULL</span>, blackbg <span class='op'>=</span> <span class='cn'>F</span>,
-  ws.avg <span class='op'>=</span> <span class='cn'>F</span><span class='op'>)</span></pre>
+  ws.avg <span class='op'>=</span> <span class='cn'>F</span>, bw <span class='op'>=</span> <span class='cn'>F</span><span class='op'>)</span></pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -150,7 +150,7 @@
     </tr>
     <tr>
       <th>save.outline</th>
-      <td><p>boolean, should an outline image be saved in the same directory</p></td>
+      <td><p>boolean, should an outline image be saved in the same directory?</p></td>
     </tr>
     <tr>
       <th>img.name</th>
@@ -163,6 +163,10 @@
     <tr>
       <th>ws.avg</th>
       <td><p>watershed average : this allows to perform a watershed after a feature detection with no watershed, and to compute for each feature bbox width/height average and sum on the different sub-features obtained through watershed</p></td>
+    </tr>
+    <tr>
+      <th>bw</th>
+      <td><p>boolean, is it a black and white (greyscale) image? In this case huethres is not required.</p></td>
     </tr>
     </table>
     

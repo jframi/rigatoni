@@ -1,7 +1,7 @@
 Package: Rigatoni
 Type: Package
 Title: Object detection (typically grains) in images
-Version: 0.7.1
+Version: 0.8
 Author: J-F Rami
 Maintainer: J-F Rami <rami@ciradfr>
 Description: Rigatoni is an experimental port of the grainito (https://github.com/jframi/grainito) ImageJ macro
