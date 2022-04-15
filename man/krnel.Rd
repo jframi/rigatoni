@@ -45,11 +45,11 @@ krnel(
 \value{
 the function will return krnel object, ie. a list with three components
 \itemize{
-\item features : a data.frame with as many rows as the number of detected features and description variables as returned by \link[EBImage:computeFeatures]{EBImage::computeFeatures} It also includes bounding box width and height aka Feret min and max diameter.
+\item features : a data.frame with as many rows as the number of detected features and description variables as returned by \link[EBImage:computeFeatures]{EBImage::computeFeatures} It also includes : (i) bounding box width and height aka Feret min and max diameter (bbox.width, bbox.height), (ii) pole of inaccessibility coordinates and longest distance to 'coastline' (poi.x,poi.y,poi.dist). In complex shapes, poi.dist might be a good measure of object width.
 \item contours : a list with as many elements as the number of detected features. Each element is a matrix with the coordinates of each feature.
 \item bbox : a list with as many elements as the number of detected features. Each element is a list with 4 components: $pts that contains the coordinates of each corner of the bounding box, $width, $height, and $angle
 \item params : a list with the analysis parameters. can be used for further plotting
-\item ws.contours : if ws.avg=T. a list as many elements as the number of detected main features. Each elementis a list of matrix with the coordinates of each sub-features.
+\item ws.contours : if ws.avg=T. a list with as many elements as the number of detected main features. Each element is a list of matrices with contours coordinates of each sub-features.
 \item ws.bbox : if ws.avg=T. The same with bounding boxes
 \item ws.pois : if ws.avg=T. The same with point of inaccessibility
 }

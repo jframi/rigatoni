@@ -90,11 +90,11 @@
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>the function will return krnel object, ie. a list with three components</p><ul><li><p>features : a data.frame with as many rows as the number of detected features and description variables as returned by <a href="https://rdrr.io/pkg/EBImage/man/computeFeatures.html" class="external-link">EBImage::computeFeatures</a> It also includes bounding box width and height aka Feret min and max diameter.</p></li>
+    <p>the function will return krnel object, ie. a list with three components</p><ul><li><p>features : a data.frame with as many rows as the number of detected features and description variables as returned by <a href="https://rdrr.io/pkg/EBImage/man/computeFeatures.html" class="external-link">EBImage::computeFeatures</a> It also includes : (i) bounding box width and height aka Feret min and max diameter (bbox.width, bbox.height), (ii) pole of inaccessibility coordinates and longest distance to 'coastline' (poi.x,poi.y,poi.dist). In complex shapes, poi.dist might be a good measure of object width.</p></li>
 <li><p>contours : a list with as many elements as the number of detected features. Each element is a matrix with the coordinates of each feature.</p></li>
 <li><p>bbox : a list with as many elements as the number of detected features. Each element is a list with 4 components: $pts that contains the coordinates of each corner of the bounding box, $width, $height, and $angle</p></li>
 <li><p>params : a list with the analysis parameters. can be used for further plotting</p></li>
-<li><p>ws.contours : if ws.avg=T. a list as many elements as the number of detected main features. Each elementis a list of matrix with the coordinates of each sub-features.</p></li>
+<li><p>ws.contours : if ws.avg=T. a list with as many elements as the number of detected main features. Each element is a list of matrices with contours coordinates of each sub-features.</p></li>
 <li><p>ws.bbox : if ws.avg=T. The same with bounding boxes</p></li>
 <li><p>ws.pois : if ws.avg=T. The same with point of inaccessibility</p></li>
 </ul></div>
