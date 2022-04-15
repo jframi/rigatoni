@@ -9,6 +9,9 @@ get_huethr_values(img, return.values = TRUE)
 \arguments{
 \item{return.values}{}
 }
+\value{
+
+}
 \description{
 Plot the histogram of hue values of image to determine the hue range of the background
 }

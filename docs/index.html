@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">Rigatoni</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="articles/Rigatoni.html">Get started</a>
 </li>
@@ -62,64 +58,77 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="rigatoni" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#rigatoni" class="anchor"></a>Rigatoni</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="rigatoni">Rigatoni<a class="anchor" aria-label="anchor" href="#rigatoni"></a>
+</h1></div>
 <!-- badges: start -->
 <!-- badges: end -->
-<p>Rigatoni is an experimental port, based on the EBImage package, of the grainito (<a href="https://github.com/jframi/grainito" class="uri">https://github.com/jframi/grainito</a>) ImageJ macro.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<p>Rigatoni is an experimental port, based on the EBImage package, of the grainito (<a href="https://github.com/jframi/grainito" class="external-link uri">https://github.com/jframi/grainito</a>) ImageJ macro.</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>Install dependencies from CRAN</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"data.table"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"polylabelr"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"data.table"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"polylabelr"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></code></pre></div>
 <p>Install dependencies from github</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/remotes/man/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"MomX/Momocs2"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"MomX/Momocs2"</span><span class="op">)</span></code></pre></div>
 <p>Install dependencies from Bioconductor</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
-    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
-<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span><span class="op">(</span><span class="st">"EBImage"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
+<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"EBImage"</span><span class="op">)</span></code></pre></div>
 <p>Then install Rigatoni from github</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/remotes/man/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"jframi/rigatoni"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"jframi/rigatoni"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="getting-started" class="section level2">
-<h2 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting started</h2>
-<p>Read the <a href="https://jframi.github.io/rigatoni/articles/Rigatoni.html">Vignette</a> to get started</p>
+<div class="section level2">
+<h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+</h2>
+<p>Read the <a href="https://jframi.github.io/rigatoni/articles/Rigatoni.html" class="external-link">Vignette</a> to get started</p>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>GPL (&gt;= 2)</li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing Rigatoni</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>J-F Rami <br><small class="roles"> Maintainer </small>  </li>
 </ul>
 </div>
+
+
 
   </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by J-F Rami.</p>
+  <p></p>
+<p>Developed by J-F Rami.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -127,6 +136,8 @@
 
   
 
+
+  
 
   </body>
 </html>

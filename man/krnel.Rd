@@ -4,9 +4,20 @@
 \alias{krnel}
 \title{main function to identify features in an image}
 \usage{
-krnel(img, crop = NULL, resizw = NULL, watershed = F, huethres,
-  minsize, maxsize, save.outline = F, img.name = NULL, blackbg = F,
-  ws.avg = F, bw = F)
+krnel(
+  img,
+  crop = NULL,
+  resizw = NULL,
+  watershed = F,
+  huethres,
+  minsize,
+  maxsize,
+  save.outline = F,
+  img.name = NULL,
+  blackbg = F,
+  ws.avg = F,
+  bw = F
+)
 }
 \arguments{
 \item{img}{the path to the image file to analyze or an Image object as defined by the EBImage package}
@@ -34,7 +45,7 @@ krnel(img, crop = NULL, resizw = NULL, watershed = F, huethres,
 \value{
 the function will return krnel object, ie. a list with three components
 \itemize{
-\item features : a data.frame with as many rows as the number of detected features and description variables as returned by EBImage::computeFeatures. It also includes bounding box width and height aka Feret min and max diameter.
+\item features : a data.frame with as many rows as the number of detected features and description variables as returned by \link[EBImage:computeFeatures]{EBImage::computeFeatures} It also includes bounding box width and height aka Feret min and max diameter.
 \item contours : a list with as many elements as the number of detected features. Each element is a matrix with the coordinates of each feature.
 \item bbox : a list with as many elements as the number of detected features. Each element is a list with 4 components: $pts that contains the coordinates of each corner of the bounding box, $width, $height, and $angle
 \item params : a list with the analysis parameters. can be used for further plotting

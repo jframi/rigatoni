@@ -4,11 +4,24 @@
 \alias{plot.krnel}
 \title{plot features of a krnel object}
 \usage{
-\method{plot}{krnel}(x, label = TRUE, label.cex = 0.6,
-  label.col = "red", plot.bbox = T, bbox.col = "blue", title = T,
-  plot.radii = T, plot.ellipse = T, plot.ws.bbox = F,
-  ws.bbox.col = "pink", plot.pois = F, plot.ws.pois = F,
-  poi.col = "lightblue", poi.ws.col = "lightblue", custom.col = NULL)
+\method{plot}{krnel}(
+  x,
+  label = TRUE,
+  label.cex = 0.6,
+  label.col = "red",
+  plot.bbox = T,
+  bbox.col = "blue",
+  title = T,
+  plot.radii = T,
+  plot.ellipse = T,
+  plot.ws.bbox = F,
+  ws.bbox.col = "pink",
+  plot.pois = F,
+  plot.ws.pois = F,
+  poi.col = "lightblue",
+  poi.ws.col = "lightblue",
+  custom.col = NULL
+)
 }
 \arguments{
 \item{x}{a krnel object as returned by the krnel function}
