@@ -98,7 +98,7 @@
             minsize <span class="op">=</span> <span class="fl">200</span>,
             maxsize <span class="op">=</span> <span class="fl">20000</span>,
             save.outline <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></code></pre></div>
-<p>Note that the <code>img</code> parameter can either be an Image object previously obtained with <code><a href="https://rdrr.io/pkg/EBImage/man/io.html" class="external-link">EBImage::readImage</a></code> or the name of an image file that is in your working directory (or it’s full patch if located elsewhere).<br>
+<p>Note that the <code>img</code> parameter can either be an Image object previously obtained with <code><a href="https://rdrr.io/pkg/EBImage/man/io.html" class="external-link">EBImage::readImage</a></code> or the name of an image file that is in your working directory (or it’s full path if located elsewhere).<br>
 The <code>resizw</code> parameter allows to reduce image size by providing the width of the image that will be analyzed (height will be modified accordingly to respect h/w ratio). Reducing the size of the image improves the performance of features detection and is important when many images need to be analysed sequentially.<br>
 The <code>minsize</code> and <code>maxsize</code> parameters allow to fix the minimum and maximum size (area) of the objects that will be captured in the image. Note that the two parameters are expressed relatively to the resized image.</p>
 <p>The object that is returned by the <code>krnel</code> function is of S3 class.. <code>krnel</code><br>
