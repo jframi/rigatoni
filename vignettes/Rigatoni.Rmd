@@ -73,7 +73,7 @@ pods<-krnel(img = img,
             save.outline = F)
 ```
 
-Note that the `img` parameter can either be an Image object previously obtained with `EBImage::readImage` or the name of an image file that is in your working directory (or it's full patch if located elsewhere).  
+Note that the `img` parameter can either be an Image object previously obtained with `EBImage::readImage` or the name of an image file that is in your working directory (or it's full path if located elsewhere).  
 The `resizw` parameter allows to reduce image size by providing the width of the image that will be analyzed (height will be modified accordingly to respect h/w ratio). Reducing the size of the image improves the performance of features detection and is important when many images need to be analysed sequentially.  
 The `minsize` and `maxsize` parameters allow to fix the minimum and maximum size (area) of the objects that will be captured in the image. Note that the two parameters are expressed relatively to the resized image.
 
