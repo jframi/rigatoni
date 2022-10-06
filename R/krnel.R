@@ -11,6 +11,8 @@
 #' @param blackbg behave differently in case the background is black
 #' @param bw boolean, is it a black and white (greyscale) image? In this case huethres is not required.
 #' @param ws.avg watershed average : this allows to perform a watershed after a feature detection with no watershed, and to compute for each feature bbox width/height average and sum on the different sub-features obtained through watershed
+#' @param color.erode boolean, apply morphological erosion to each feature before getting feature's color. This is way to estimate color from the center part of each feature, to avoid border effects.
+#' @param colerode.rad.ratio if color.erode is true, this is the size of the round brush used for morphological erosion expressed as a ratio (>0, <=1) of the average radius of all feaures detected on the image
 #'
 #' @return the function will return krnel object, ie. a list with three components
 #' * features : a data.frame with as many rows as the number of detected features and description variables as returned by [EBImage::computeFeatures] It also includes : (i) bounding box width and height aka Feret min and max diameter (bbox.width, bbox.height), (ii) pole of inaccessibility coordinates and longest distance to 'coastline' (poi.x,poi.y,poi.dist). In complex shapes, poi.dist might be a good measure of object width.
@@ -24,7 +26,7 @@
 #' @importFrom polylabelr poi
 #' @export
 #' @examples
-krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, maxsize, save.outline=F, img.name=NULL, blackbg=F, ws.avg=F, bw=F){
+krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, maxsize, save.outline=F, img.name=NULL, blackbg=F, ws.avg=F, bw=F, color.erode=T, colerode.rad.ratio=0.75){
 
   #mf<-match.call()
   #if(class(eval(mf$img))=="Image"){
@@ -115,6 +117,8 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   #nmask[!nmask%in%(names(which(table(c(imageData(nmask)))<maxsize)))]<-0
   nmask <- rmObjects(nmask,which(computeFeatures.shape(nmask)[,"s.area"]>maxsize))
 
+  nmask.cont<-ocontour(nmask)
+
   # get features
   nmask.shp<-computeFeatures.shape(nmask)
   nmask.mom<-computeFeatures.moment(nmask)
@@ -123,14 +127,29 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   #nmask.basg<-computeFeatures.basic(nmask,channel(img,"g"))
   #nmask.basb<-computeFeatures.basic(nmask,channel(img,"b"))
   if (numberOfFrames(img)>=3){
-    nmask.basr<-computeFeatures.basic(nmask,img[,,1])
-    nmask.basg<-computeFeatures.basic(nmask,img[,,2])
-    nmask.basb<-computeFeatures.basic(nmask,img[,,3])
+    if (!color.erode){
+      nmask.basr<-computeFeatures.basic(nmask,img[,,1])
+      nmask.basg<-computeFeatures.basic(nmask,img[,,2])
+      nmask.basb<-computeFeatures.basic(nmask,img[,,3])
+    } else {
+      # Create a new mask image from using offset of the contours
+      #nmask.cont2 <- lapply(nmask.cont, function(a) list(x=a[,1],y=a[,2]))
+      #nmask.cont3 <- polyclip::polyoffset(nmask.cont2,delta = -5, x0=0, y0=0)
+      brushsize <- 2*round(mean(nmask.shp[,which(colnames(nmask.shp)=="s.radius.mean")])*colerode.rad.ratio/2,0)-1
+      nmask.er <- bwlabel(erode(nmask, makeBrush(brushsize, shape = "disc")))
+      if (watershed){
+        dmap = distmap(nmask.er)
+        nmask.er = watershed(dmap)
+      }
+
+      nmask.basr<-computeFeatures.basic(nmask.er,img[,,1])
+      nmask.basg<-computeFeatures.basic(nmask.er,img[,,2])
+      nmask.basb<-computeFeatures.basic(nmask.er,img[,,3])
+    }
     cols<-rgb(nmask.basr[,1],nmask.basg[,1],nmask.basb[,1])
   } else {
     cols <- rgb(nmask.bas[,1],nmask.bas[,1],nmask.bas[,1])
   }
-  nmask.cont<-ocontour(nmask)
 
   # Compute bounding boxes (bbox)
   nmask.bbox <- lapply(nmask.cont, getBBox)
@@ -212,7 +231,12 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
     ret$ws.pois <- ret.ws[,.(parent, poi.x,poi.y,poi.dist)]
   }
   if (save.outline){
-    writeImage(paintObjects(nmask,img,thick = resizw>1500),
+    if (color.erode){
+      outline.img <- paintObjects(nmask.er,paintObjects(nmask,img,thick = resizw>1500), col=c("green",NA), thick = resizw>1500)
+    } else {
+      outline.img <- paintObjects(nmask,img,thick = resizw>1500)
+    }
+    writeImage(outline.img,
                files=paste0(img.name,".outline.jpg"),
                type="jpeg",
                quality = 80)
