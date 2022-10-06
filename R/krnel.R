@@ -26,7 +26,7 @@
 #' @importFrom polylabelr poi
 #' @export
 #' @examples
-krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, maxsize, save.outline=F, img.name=NULL, blackbg=F, ws.avg=F, bw=F, color.erode=T, colerode.rad.ratio=0.75){
+krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, maxsize, save.outline=F, img.name=NULL, blackbg=F, ws.avg=F, bw=F, color.erode=F, colerode.rad.ratio=0.75){
 
   #mf<-match.call()
   #if(class(eval(mf$img))=="Image"){
@@ -37,6 +37,10 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   if (bw & missing(huethres)){
     huethres <- c(0,0)
   }
+  if (color.erode==TRUE & colerode.rad.ratio==0){
+    color.erode <- FALSE
+  }
+
   if (!class(img)=="Image"){
     img.name <- img
     img = suppressWarnings(readImage(img))
