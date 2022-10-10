@@ -103,12 +103,11 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   # get mask
   nmask = fillHull(1-xhti)
   nmask = bwlabel(nmask)
+  nmask.shp <- computeFeatures.shape(nmask)
 
   # filter on minsize
   #nmask[!nmask%in%(which(table(c(imageData(nmask)))>minsize)-1)]<-0
-  nmask <- rmObjects(nmask,which(computeFeatures.shape(nmask)[,"s.area"]<minsize))
-  ## filter on maxsize
-  #nmask[!nmask%in%(names(which(table(c(imageData(nmask)))<maxsize)))]<-0
+  nmask <- rmObjects(nmask,which(nmask.shp[,"s.area"]<minsize))
 
   if (watershed){
     dmap = distmap(nmask)
@@ -127,36 +126,82 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   nmask.shp<-computeFeatures.shape(nmask)
   nmask.mom<-computeFeatures.moment(nmask)
   nmask.bas<-computeFeatures.basic(nmask,img)
-  #nmask.basr<-computeFeatures.basic(nmask,channel(img,"r"))
-  #nmask.basg<-computeFeatures.basic(nmask,channel(img,"g"))
-  #nmask.basb<-computeFeatures.basic(nmask,channel(img,"b"))
+
   if (numberOfFrames(img)>=3){
     if (!color.erode){
       nmask.basr<-computeFeatures.basic(nmask,img[,,1])
       nmask.basg<-computeFeatures.basic(nmask,img[,,2])
       nmask.basb<-computeFeatures.basic(nmask,img[,,3])
+      cols<-rgb(nmask.basr[,1],nmask.basg[,1],nmask.basb[,1])
+
     } else {
-      # Create a new mask image from using offset of the contours
-      #nmask.cont2 <- lapply(nmask.cont, function(a) list(x=a[,1],y=a[,2]))
-      #nmask.cont3 <- polyclip::polyoffset(nmask.cont2,delta = -5, x0=0, y0=0)
-      brushsize <- 2*round(mean(nmask.shp[,which(colnames(nmask.shp)=="s.radius.mean")])*colerode.rad.ratio/2,0)-1
+      # Erode the nmask image
+      # compute the brushsize
+      brushsize <- 2*round(min(nmask.shp[,which(colnames(nmask.shp)=="s.radius.mean")])*colerode.rad.ratio/2,0)-1
+      # apply morphological erosion to the nmask image
       nmask.er <- bwlabel(erode(nmask, makeBrush(brushsize, shape = "disc")))
       if (watershed){
         dmap = distmap(nmask.er)
         nmask.er = watershed(dmap)
       }
 
-      nmask.basr<-computeFeatures.basic(nmask.er,img[,,1])
-      nmask.basg<-computeFeatures.basic(nmask.er,img[,,2])
-      nmask.basb<-computeFeatures.basic(nmask.er,img[,,3])
+          # Compute features on the eroded image
+          nmask.er.shp <- computeFeatures.shape(nmask.er)
+          nmask.er.mom <- computeFeatures.moment(nmask.er)
+          nmask.basr<-computeFeatures.basic(nmask.er,img[,,1])
+          nmask.basg<-computeFeatures.basic(nmask.er,img[,,2])
+          nmask.basb<-computeFeatures.basic(nmask.er,img[,,3])
+
+          #xi <- as.Image(x)
+          #nmask.bash<-computeFeatures.basic(nmask.er,xi[,,1])
+          #nmask.bass<-computeFeatures.basic(nmask.er,xi[,,2])
+          #nmask.basv<-computeFeatures.basic(nmask.er,xi[,,3])
+
+          # We need to match the features detected on the eroded image
+          # to the ones detected on the non-eroded image
+          # we use the centers of the features detected on the eroded image
+          # and use the pointinpolygon function and the contours or features detected on non-eroded image
+
+          nmask.er.mom.dt <- data.table(nmask.er.mom)
+          nmask.er.shp.dt <- data.table(nmask.er.shp)
+          nmask.er.shp.dt[,id:=1:.N]
+
+          # pip contains the result of pointinpolygon function
+          # for all contours on the original image
+          pip <- lapply(1:length(nmask.cont),
+                 function(a) polyclip::pointinpolygon(P=list(x=nmask.er.mom.dt$m.cx,
+                                                             y=nmask.er.mom.dt$m.cy),
+                                                      A=list(x=nmask.cont[[a]][,1],
+                                                             y=nmask.cont[[a]][,2])))
+          # pip.dt is a datatable that as all eroded features attributed to each orginal contour, NA if none.
+          pip.dt <- do.call(rbind,Map(function(p,n) data.table(eroded_id=ifelse(any(p==1),which(p==1),NA),id=n), pip, 1:length(pip)))
+          # pip.dt.j brings the size of eroded features together with pip.dt
+          pip.dtj <- setnames(nmask.er.shp.dt[pip.dt, on=.(id=eroded_id)], c("id","i.id"),c("eroded_id","id"))
+          # pip.dtjf is the previous one filtered to keep the largest eroded feature for each original contour
+          # nrow(pip.dtjf) should always == length(nmask.cont)
+          pip.dtjf <- pip.dtj[,.(.N, eroded_id=eroded_id[which.max(s.area)]),id]
+
+      # compute hex colors of all eroded features
+      cols<-rgb(nmask.basr[,1],
+                nmask.basg[,1],
+                nmask.basb[,1])
+      # and keep only the ones that have a corresponding id in the orginal image,
+      # and sort them according to the order of features in the original image
+      cols <- cols[pip.dtjf[order(id)]$eroded_id]
+
+      #colshsv <- hsv(nmask.bash[,1],
+      #               nmask.bass[,1],
+      #               nmask.basv[,1])
+      #colshsv <- colshsv[pip.dtjf[order(id)]$eroded_id]
+
+      if (any(is.na(cols))) warning("Some colors are. Erosion was too string Consider decreasing colerode.rad.ratio")
     }
-    cols<-rgb(nmask.basr[,1],nmask.basg[,1],nmask.basb[,1])
   } else {
     cols <- rgb(nmask.bas[,1],nmask.bas[,1],nmask.bas[,1])
   }
 
   # Compute bounding boxes (bbox)
-  nmask.bbox <- lapply(nmask.cont, getBBox)
+  nmask.bbox <- lapply(nmask.cont, Rigatoni:::getBBox)
   # bbox width should always be smaller than height
   nmask.bbox.wh <- do.call(rbind,lapply(nmask.bbox, function(a) data.table(bbox.width=ifelse(a$width<a$height, a$width, a$height), bbox.height=ifelse(a$width<a$height, a$height, a$width))))
 
@@ -171,6 +216,7 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
                                  nmask.mom,
                                  nmask.bas,
                                  cols),
+                                 #colshsv),
             contours=nmask.cont,
             bbox = nmask.bbox,
             params=list(crops=crop,
@@ -236,7 +282,7 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   }
   if (save.outline){
     if (color.erode){
-      outline.img <- paintObjects(nmask.er,paintObjects(nmask,img,thick = resizw>1500), col=c("green",NA), thick = resizw>1500)
+      outline.img <- paintObjects(nmask.er,paintObjects(nmask,img,thick = resizw>1500), col=c("white",NA), thick = resizw>1500)
     } else {
       outline.img <- paintObjects(nmask,img,thick = resizw>1500)
     }
