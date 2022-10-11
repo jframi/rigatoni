@@ -16,7 +16,9 @@ krnel(
   img.name = NULL,
   blackbg = F,
   ws.avg = F,
-  bw = F
+  bw = F,
+  color.erode = F,
+  colerode.rad.ratio = 0.75
 )
 }
 \arguments{
@@ -41,6 +43,10 @@ krnel(
 \item{ws.avg}{watershed average : this allows to perform a watershed after a feature detection with no watershed, and to compute for each feature bbox width/height average and sum on the different sub-features obtained through watershed}
 
 \item{bw}{boolean, is it a black and white (greyscale) image? In this case huethres is not required.}
+
+\item{color.erode}{boolean, apply morphological erosion to each feature before getting feature's color. This is way to estimate color from the center part of each feature, to avoid border effects.}
+
+\item{colerode.rad.ratio}{if color.erode is true, this is the size of the round brush used for morphological erosion expressed as a ratio (>0, <=1) of the average radius of all feaures detected on the image}
 }
 \value{
 the function will return krnel object, ie. a list with three components

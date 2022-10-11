@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">Rigatoni</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9</span>
       </span>
     </div>
 
@@ -59,7 +59,9 @@
   img.name <span class="op">=</span> <span class="cn">NULL</span>,
   blackbg <span class="op">=</span> <span class="cn">F</span>,
   ws.avg <span class="op">=</span> <span class="cn">F</span>,
-  bw <span class="op">=</span> <span class="cn">F</span>
+  bw <span class="op">=</span> <span class="cn">F</span>,
+  color.erode <span class="op">=</span> <span class="cn">F</span>,
+  colerode.rad.ratio <span class="op">=</span> <span class="fl">0.75</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -87,6 +89,10 @@
 <dd><p>watershed average : this allows to perform a watershed after a feature detection with no watershed, and to compute for each feature bbox width/height average and sum on the different sub-features obtained through watershed</p></dd>
 <dt>bw</dt>
 <dd><p>boolean, is it a black and white (greyscale) image? In this case huethres is not required.</p></dd>
+<dt>color.erode</dt>
+<dd><p>boolean, apply morphological erosion to each feature before getting feature's color. This is way to estimate color from the center part of each feature, to avoid border effects.</p></dd>
+<dt>colerode.rad.ratio</dt>
+<dd><p>if color.erode is true, this is the size of the round brush used for morphological erosion expressed as a ratio (&gt;0, &lt;=1) of the average radius of all feaures detected on the image</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -111,7 +117,8 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
       </footer></div>

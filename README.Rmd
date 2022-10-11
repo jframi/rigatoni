@@ -28,6 +28,7 @@ Install dependencies from CRAN
 ``` r
 install.packages("data.table")
 install.packages("polylabelr")
+install.packages("polyclip")
 install.packages("devtools")
 ```
 Install dependencies from github

@@ -24,6 +24,7 @@
 #' * ws.pois : if ws.avg=T. The same with point of inaccessibility
 #' @md
 #' @importFrom polylabelr poi
+#' @importFrom polyclip pointinpolygon
 #' @export
 #' @examples
 krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, maxsize, save.outline=F, img.name=NULL, blackbg=F, ws.avg=F, bw=F, color.erode=F, colerode.rad.ratio=0.75){

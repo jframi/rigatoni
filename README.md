@@ -4,7 +4,6 @@
 # Rigatoni
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 Rigatoni is an experimental port, based on the EBImage package, of the
@@ -17,6 +16,7 @@ Install dependencies from CRAN
 ``` r
 install.packages("data.table")
 install.packages("polylabelr")
+install.packages("polyclip")
 install.packages("devtools")
 ```
 

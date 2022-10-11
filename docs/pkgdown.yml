@@ -1,7 +1,7 @@
-pandoc: 2.14.0.3
+pandoc: '2.18'
 pkgdown: 2.0.2
 pkgdown_sha: ~
 articles:
   Rigatoni: Rigatoni.html
-last_built: 2022-04-15T07:35Z
+last_built: 2022-10-11T09:37Z
 
