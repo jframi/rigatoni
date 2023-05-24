@@ -4,11 +4,13 @@
 #' @param crop a numeric vector in the form c(xmin, xmax, ymin, ymax) to define cropping area
 #' @param resizw the width of resized image to use for feature detection. decreasing the size of the image will improve performance
 #' @param huethres a numeric vector in the form c(Huemin, Huemax) to define Hue threshold. Can be easily determined using the get_huethr_values function
+#' @param vthres an optional v value threshold under which pixels are considered as part of features (override huesthres values)
 #' @param minsize the minimum size of features to be considered, in pixel, as determined on the resized image
 #' @param maxsize the maximum size of features to be considered, in pixel, as determined on the resized image
 #' @param save.outline boolean, should an outline image be saved in the same directory?
 #' @param img.name name of the image. This is useful in the case img is an Image object and save.outline is TRUE. This will be used for the name of the outline file.
 #' @param blackbg behave differently in case the background is black
+#' @param whitebg behave differently in case the background is white
 #' @param bw boolean, is it a black and white (greyscale) image? In this case huethres is not required.
 #' @param ws.avg watershed average : this allows to perform a watershed after a feature detection with no watershed, and to compute for each feature bbox width/height average and sum on the different sub-features obtained through watershed
 #' @param color.erode boolean, apply morphological erosion to each feature before getting feature's color. This is way to estimate color from the center part of each feature, to avoid border effects.
