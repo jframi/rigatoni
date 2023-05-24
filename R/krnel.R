@@ -27,7 +27,7 @@
 #' @importFrom polyclip pointinpolygon
 #' @export
 #' @examples
-krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, maxsize, save.outline=F, img.name=NULL, blackbg=F, ws.avg=F, bw=F, color.erode=F, colerode.rad.ratio=0.75){
+krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, vthres=NULL, minsize, maxsize, save.outline=F, img.name=NULL, blackbg=F, whitebg=F, ws.avg=F, bw=F, color.erode=F, colerode.rad.ratio=0.75){
 
   #mf<-match.call()
   #if(class(eval(mf$img))=="Image"){
@@ -35,7 +35,7 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   #}else{
   #  img.name<-eval(mf$img)
   #}
-  if (bw & missing(huethres)){
+  if ((bw | blackbg | whitebg) & missing(huethres)){
     huethres <- c(0,0)
   }
   if (color.erode==TRUE & colerode.rad.ratio==0){
@@ -67,17 +67,22 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   if (bw){
       img@colormode <- Grayscale
       if (blackbg == TRUE){
-        xhti <- (1-(img>otsu(img)))
+        xhti <- (1-(img>otsu(img)[1]))
       } else {
-        xhti <- img>otsu(img)
+        xhti <- img>otsu(img)[1]
       }
       if (numberOfFrames(img, type="total")>1) {
         xhti <- xhti[,,1]
       }
     } else {
-    if (blackbg == TRUE){
-      img@colormode <- Grayscale
-      xhti <- (1-(img>otsu(img)))
+    if (blackbg | whitebg){
+      img2 <- img
+      img2@colormode <- Grayscale
+      if (whitebg) {
+        xhti <- ((img2>otsu(img2)[1]))
+      } else {
+        xhti <- (1 - (img2>otsu(img2)[1]))
+      }
       if (numberOfFrames(img, type="total")>1) {
         xhti <- xhti[,,1]
       }
@@ -96,6 +101,10 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
       xht[xht<=(minhue/255)]<-0
       xht[xht>=(maxhue/255)]<-0
       xht[xht>(minhue/255) & xht<(maxhue/255)]<-1
+      if (!is.null(vthres)){
+        xv<-matrix(x[3,],nrow = resizw)
+        xht[xv<vthres]<-0
+      }
       # make it an image
       xhti<-as.Image(xht)
     }
@@ -109,6 +118,8 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
   # filter on minsize
   #nmask[!nmask%in%(which(table(c(imageData(nmask)))>minsize)-1)]<-0
   nmask <- rmObjects(nmask,which(nmask.shp[,"s.area"]<minsize))
+  #nmask <- rmObjects(nmask,data.table(o=c(nmask@.Data))[,.N,o][N<minsize]$o)
+
 
   if (watershed){
     dmap = distmap(nmask)
@@ -116,10 +127,13 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, minsize, ma
     # filter on minsize
     #nmask[!nmask%in%(which(table(c(imageData(nmask)))>minsize)-1)]<-0
     nmask <- rmObjects(nmask,which(computeFeatures.shape(nmask)[,"s.area"]<minsize))
+    #nmask <- rmObjects(nmask,data.table(o=c(nmask@.Data))[,.N,o][N<minsize]$o)
+
   }
   # filter on maxsize
   #nmask[!nmask%in%(names(which(table(c(imageData(nmask)))<maxsize)))]<-0
   nmask <- rmObjects(nmask,which(computeFeatures.shape(nmask)[,"s.area"]>maxsize))
+  #nmask <- rmObjects(nmask,data.table(o=c(nmask@.Data))[,.N,o][N>maxsize]$o)
 
   nmask.cont<-ocontour(nmask)
 
