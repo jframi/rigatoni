@@ -10,15 +10,19 @@ krnel(
   resizw = NULL,
   watershed = F,
   huethres,
+  vthres = NULL,
   minsize,
   maxsize,
   save.outline = F,
   img.name = NULL,
   blackbg = F,
+  whitebg = F,
   ws.avg = F,
   bw = F,
   color.erode = F,
-  colerode.rad.ratio = 0.75
+  colerode.rad.ratio = 0.75,
+  open = FALSE,
+  open.brush.size = 5
 )
 }
 \arguments{
@@ -30,6 +34,8 @@ krnel(
 
 \item{huethres}{a numeric vector in the form c(Huemin, Huemax) to define Hue threshold. Can be easily determined using the get_huethr_values function}
 
+\item{vthres}{an optional v value threshold under which pixels are considered as part of features (override huesthres values)}
+
 \item{minsize}{the minimum size of features to be considered, in pixel, as determined on the resized image}
 
 \item{maxsize}{the maximum size of features to be considered, in pixel, as determined on the resized image}
@@ -40,6 +46,8 @@ krnel(
 
 \item{blackbg}{behave differently in case the background is black}
 
+\item{whitebg}{behave differently in case the background is white}
+
 \item{ws.avg}{watershed average : this allows to perform a watershed after a feature detection with no watershed, and to compute for each feature bbox width/height average and sum on the different sub-features obtained through watershed}
 
 \item{bw}{boolean, is it a black and white (greyscale) image? In this case huethres is not required.}
@@ -47,6 +55,10 @@ krnel(
 \item{color.erode}{boolean, apply morphological erosion to each feature before getting feature's color. This is way to estimate color from the center part of each feature, to avoid border effects.}
 
 \item{colerode.rad.ratio}{if color.erode is true, this is the size of the round brush used for morphological erosion expressed as a ratio (>0, <=1) of the average radius of all feaures detected on the image}
+
+\item{open}{apply an open operation (erode+dilate) to suppress possible artefact attached to the detected feature. If watershed=T open is applied before watershed.}
+
+\item{open.brush.size}{size of the brush to use for the open operation. Brush shape is hardcoded as 'disc'.}
 }
 \value{
 the function will return krnel object, ie. a list with three components

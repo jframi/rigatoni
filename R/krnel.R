@@ -15,6 +15,8 @@
 #' @param ws.avg watershed average : this allows to perform a watershed after a feature detection with no watershed, and to compute for each feature bbox width/height average and sum on the different sub-features obtained through watershed
 #' @param color.erode boolean, apply morphological erosion to each feature before getting feature's color. This is way to estimate color from the center part of each feature, to avoid border effects.
 #' @param colerode.rad.ratio if color.erode is true, this is the size of the round brush used for morphological erosion expressed as a ratio (>0, <=1) of the average radius of all feaures detected on the image
+#' @param open apply an open operation (erode+dilate) to suppress possible artefact attached to the detected feature. If watershed=T open is applied before watershed.
+#' @param open.brush.size size of the brush to use for the open operation. Brush shape is hardcoded as 'disc'.
 #'
 #' @return the function will return krnel object, ie. a list with three components
 #' * features : a data.frame with as many rows as the number of detected features and description variables as returned by [EBImage::computeFeatures] It also includes : (i) bounding box width and height aka Feret min and max diameter (bbox.width, bbox.height), (ii) pole of inaccessibility coordinates and longest distance to 'coastline' (poi.x,poi.y,poi.dist). In complex shapes, poi.dist might be a good measure of object width.
@@ -29,7 +31,7 @@
 #' @importFrom polyclip pointinpolygon
 #' @export
 #' @examples
-krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, vthres=NULL, minsize, maxsize, save.outline=F, img.name=NULL, blackbg=F, whitebg=F, ws.avg=F, bw=F, color.erode=F, colerode.rad.ratio=0.75){
+krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, vthres=NULL, minsize, maxsize, save.outline=F, img.name=NULL, blackbg=F, whitebg=F, ws.avg=F, bw=F, color.erode=F, colerode.rad.ratio=0.75, open = FALSE, open.brush.size=5){
 
   #mf<-match.call()
   #if(class(eval(mf$img))=="Image"){
@@ -121,7 +123,10 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, vthres=NULL
   #nmask[!nmask%in%(which(table(c(imageData(nmask)))>minsize)-1)]<-0
   nmask <- rmObjects(nmask,which(nmask.shp[,"s.area"]<minsize))
   #nmask <- rmObjects(nmask,data.table(o=c(nmask@.Data))[,.N,o][N<minsize]$o)
-
+  if (open){
+    nmask <- dilate(erode(nmask, makeBrush(open.brush.size, shape='disc')), makeBrush(open.brush.size, shape='disc'))
+    nmask = bwlabel(nmask)
+  }
 
   if (watershed){
     dmap = distmap(nmask)
