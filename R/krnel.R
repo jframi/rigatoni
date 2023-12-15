@@ -274,7 +274,18 @@ krnel<- function(img, crop=NULL, resizw=NULL, watershed=F, huethres, vthres=NULL
     # Construct a data.table with sub-features measurements
     ret.ws <- data.table(nmask.ws.mom,nmask.ws.bbox.wh,pois.ws)
     # Find the parent feature using bounding boxes of features detected before watershed and the is_p_in_rectangle applied to centroids of sub-features
-    ret.ws[, parent:=apply(ret.ws[,.(m.cx,m.cy)], 1, function(a) which(unlist(lapply(ret$bbox, function(b) is_p_in_rectangle(pt=a, r=b$pts)))))]
+    # ret.ws[, parent:=apply(ret.ws[,.(m.cx,m.cy)], 1, function(a) which(unlist(lapply(ret$bbox, function(b) is_p_in_rectangle(pt=a, r=b$pts)))))]
+    whoswhere <- do.call(rbind,
+                          Map(function(n,a) data.table(parent=n,id2=a),
+                              as.numeric(names(ret$contours)),
+                              lapply(ret$contours,
+                                     function(a) which(pointinpolygon(c(ret.ws[,.(x=m.cx,y=m.cy)]),
+                                                                      list(x=a[,1],y=a[,2]))==1)
+                                     )
+                              )
+                          )
+    ret.ws[,id2:=1:.N]
+    ret.ws <- whoswhere[ret.ws, on=.(id2)]
     # Compute stats group by parent feature
     ret.ws2 <- ret.ws[, .(bbox.width.ws.avg=mean(bbox.width),
                           bbox.height.ws.avg=mean(bbox.height),
